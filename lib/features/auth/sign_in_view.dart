@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import '../../core/constants/app_constants.dart';
+import '../../shared/widgets/c_text.dart';
+import '../../shared/widgets/custom_buttons.dart';
+import '../../shared/widgets/custom_textfield.dart';
+import '../../routes/app_pages.dart';
+import 'auth_controller.dart';
+
+class SignInView extends GetView<AuthController> {
+  const SignInView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20.h),
+              Container(
+                width: 80.w,
+                height: 80.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.secondary,
+                    width: 4.w,
+                  ),
+                ),
+                child: Icon(
+                  Icons.radio_button_unchecked,
+                  size: 40.sp,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 32.h),
+              Align(
+                alignment: Alignment.center,
+                child: CText(
+                  text: AppStrings.signInTitle,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 48.h),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CText(
+                  text: "Email Address",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              CustomTextField(
+                hintText: "janetdoe@email.com",
+                preffixIcon: const Icon(Icons.email_outlined, color: AppColors.grey500),
+                controller: controller.emailController,
+                keyboardType: TextInputType.emailAddress,
+                hasPreffix: true,
+                textcolor: AppColors.textPrimary,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CText(
+                  text: "Password",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+          CustomTextField(
+                hintText: "********",
+                preffixIcon: const Icon(Icons.lock_outline, color: AppColors.grey500),
+               isPassword: true,
+  hasPreffix: true,
+  hasSuffix: true,
+                controller: controller.passwordController,
+                textcolor: AppColors.textPrimary,
+              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Obx(() => Checkbox(
+              //       value: controller.isRememberMe.value,
+              //       onChanged: controller.toggleRememberMe,
+              //       activeColor: AppColors.primary,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(4.r),
+              //       ),
+              //     )),
+              //     CText(
+              //       text: "Remember me",
+              //       fontSize: 14,
+              //       fontWeight: FontWeight.w600,
+              //       color: AppColors.textPrimary,
+              //     ),
+              //   ],
+              // ),
+           
+              SizedBox(height: 40.h),
+              PrimaryIconButton(
+                icon: Icons.arrow_forward,
+                iconEnable: true,
+                width: double.infinity,
+                           text: "Sign in",
+                onTap: controller.signIn,
+              ),
+              // SizedBox(height: 24.h),
+              // CText(
+              //   text: "Forgot the password?",
+              //   fontSize: 16,
+              //   color: AppColors.primary,
+              //   fontWeight: FontWeight.w600,
+              // ),
+              SizedBox(height: 30.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CText(
+                    text: "Don't have an account? ",
+                    fontSize: 14,
+                    color: AppColors.grey500,
+                  ),
+                  GestureDetector(
+                    onTap: () => Get.toNamed(Routes.SIGN_UP),
+                    child: CText(
+                      text: "Sign up",
+                      fontSize: 14,
+                      textDecoration: TextDecoration.underline,
+        
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                      decorationColor: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

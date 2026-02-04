@@ -1,0 +1,232 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import '../../core/constants/app_constants.dart';
+import '../../shared/widgets/c_text.dart';
+
+import 'profile_controller.dart';
+class ProfileView extends GetView<ProfileController> {
+  const ProfileView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.primary,
+      body: Column(
+        children: [
+          _buildHeader(),
+          Expanded(child: _buildBody()),
+        ],
+      ),
+    );
+  }
+
+  /// HEADER
+  Widget _buildHeader() {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Row(
+          children: [
+            const Icon(Icons.arrow_back, color: Colors.white),
+            SizedBox(width: 12.w),
+            CText(
+              text: "Profile",
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// BODY
+  Widget _buildBody() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
+      ),
+      child: ListView(
+        children: [
+          _buildProfileCard(),
+          SizedBox(height: 24.h),
+
+          _sectionTitle("Account"),
+          _optionCard(Icons.settings_outlined, "Settings"),
+          _optionCard(Icons.notifications_none_outlined, "Notifications"),
+          _optionCard(Icons.lock_outline, "Privacy & Security"),
+
+          SizedBox(height: 20.h),
+
+          _sectionTitle("Support"),
+          _optionCard(Icons.help_outline, "Help Center"),
+          _optionCard(Icons.favorite_border, "About Us"),
+
+          SizedBox(height: 20.h),
+
+          _childProfileCard(),
+
+          SizedBox(height: 20.h),
+
+          _signOutCard(),
+        ],
+      ),
+    );
+  }
+
+  
+  Widget _buildProfileCard() {
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: _cardDecoration(),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 28.r,
+                backgroundColor: AppColors.primary.withOpacity(.1),
+                child: Icon(Icons.person, color: AppColors.primary, size: 28.sp),
+              ),
+              SizedBox(width: 12.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CText(
+                    text: "Ahmed",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  CText(
+                    text: "Guardian Account",
+                    fontSize: 12,
+                    color: AppColors.primary,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+
+          /// EDIT BUTTON
+          GestureDetector(
+            onTap: controller.onEditProfileTap,
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              width: double.infinity,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.grey300),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child:  CText(text: "Edit Profile", fontSize: 16.sp,),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// OPTION CARD
+  Widget _optionCard(IconData icon, String title) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(16.w),
+      decoration: _cardDecoration(),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary),
+          SizedBox(width: 12.w),
+          Expanded(child: CText(text: title, fontSize: 16.sp,)),
+          Icon(Icons.chevron_right, color: AppColors.grey400),
+        ],
+      ),
+    );
+  }
+
+  /// CHILD PROFILE
+  Widget _childProfileCard() {
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+           CText(text: "Child Profile", fontWeight: FontWeight.bold, fontSize: 16.sp,),
+          SizedBox(height: 10.h),
+          CText(
+            text: "Fatima - Age",
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600, fontSize: 16.sp,
+          ),
+          const CText(
+            text: "Sensory preferences configure",
+            fontSize: 12,
+          ),
+          SizedBox(height: 14.h),
+
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 12.h),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.grey100,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child:  CText(text: "Manage Child Profile", fontSize: 16.sp,),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// SIGN OUT
+  Widget _signOutCard() {
+    return GestureDetector(
+      onTap: controller.onLogout,
+      child: Container(
+        padding: EdgeInsets.all(18.w),
+        decoration: _cardDecoration(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.logout, color: Colors.red),
+            SizedBox(width: 8.w),
+            const CText(text: "Sign Out", color: Colors.red, fontSize: 16,),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// CARD DECORATION
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18.r),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(.05),
+          blurRadius: 10,
+        ),
+      ],
+    );
+  }
+
+  Widget _sectionTitle(String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.h),
+      child: CText(
+        text: text,
+        fontWeight: FontWeight.bold,
+        fontSize: 14,
+        color: AppColors.textSecondary,
+      ),
+    );
+  }
+}
