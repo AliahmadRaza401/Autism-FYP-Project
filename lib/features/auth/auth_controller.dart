@@ -21,12 +21,11 @@ class AuthController extends GetxController {
   }
 
   void signIn() {
-    // Simulate API call
+
         Get.offAllNamed(Routes.DASHBOARD);
   }
 
   void signUp() {
-    // Simulate API call
     Get.offNamed(Routes.PROFILE_SETUP);
   }
 }
