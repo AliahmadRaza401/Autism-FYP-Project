@@ -104,14 +104,14 @@ class PlaceCard extends StatelessWidget {
               _buildTag("Light: 2/5", AppColors.kpurple),
             ],
           ),
-          // SizedBox(height: 8.h),
-          // Row(
-          //   children: [
-          //     _buildStatusItem(Icons.check_circle, "Staff Friend", Colors.green),
-          //     SizedBox(width: 12.w),
-          //     _buildStatusItem(Icons.check_circle, "Quiet", Colors.blue),
-          //   ],
-          // ),
+          SizedBox(height: 8.h),
+          Row(
+            children: [
+              _buildStatusItem(Icons.check_circle, "Staff Friend", Colors.green),
+              SizedBox(width: 12.w),
+              _buildStatusItem(Icons.check_circle, "Quiet", Colors.blue),
+            ],
+          ),
         ],
       ),
     );

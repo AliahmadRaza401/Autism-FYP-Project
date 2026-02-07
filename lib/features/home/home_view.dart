@@ -21,18 +21,20 @@ class HomeView extends GetView<HomeController> {
         toolbarHeight: 80.h,
         centerTitle: false, 
 
-        title: Column(
+        title: Obx(() => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CText(
-              text: "Welcome Back,",
+              text: controller.currentUser.value != null 
+                  ? "Hello, ${controller.currentUser.value!.name.split(' ')[0]}" 
+                  : "Welcome Back,",
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ],
-        ),
+        )),
 
         actions: [
           Padding(
@@ -77,7 +79,7 @@ class HomeView extends GetView<HomeController> {
                           subtitle: "Search nearby",
                           onTap: controller.goToFindPlaces,
                           iconColor: AppColors.primary,
-                          bgCircleColor: AppColors.primary.withOpacity(0.15),
+                          bgCircleColor: AppColors.primary.withValues(alpha: 0.15),
                         ),
                       ),
 
@@ -90,7 +92,7 @@ class HomeView extends GetView<HomeController> {
                           subtitle: "Connect",
                           onTap: controller.goToCommunity,
                           iconColor: AppColors.kgreen,
-                          bgCircleColor: AppColors.kgreen.withOpacity(0.15),
+                          bgCircleColor: AppColors.kgreen.withValues(alpha: 0.15),
                         ),
                       ),
                     ],
@@ -196,7 +198,7 @@ class HomeView extends GetView<HomeController> {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -208,7 +210,7 @@ class HomeView extends GetView<HomeController> {
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: bgCircleColor ?? AppColors.primary.withOpacity(0.15),
+                color: bgCircleColor ?? AppColors.primary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(

@@ -90,7 +90,7 @@ class ProfileView extends GetView<ProfileController> {
             children: [
               CircleAvatar(
                 radius: 28.r,
-                backgroundColor: AppColors.primary.withOpacity(.1),
+                backgroundColor: AppColors.primary.withValues(alpha: .1),
                 child: Icon(Icons.person, color: AppColors.primary, size: 28.sp),
               ),
               SizedBox(width: 12.w),
@@ -211,7 +211,7 @@ class ProfileView extends GetView<ProfileController> {
       borderRadius: BorderRadius.circular(18.r),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(.05),
+          color: Colors.black.withValues(alpha: .05),
           blurRadius: 10,
         ),
       ],

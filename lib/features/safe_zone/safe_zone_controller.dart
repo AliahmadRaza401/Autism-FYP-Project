@@ -1,13 +1,21 @@
 import 'dart:ui';
-
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../routes/app_pages.dart';
+import '../../data/repositories/safe_zone_repository.dart';
+import '../../data/repositories/auth_repository.dart';
+import '../../data/models/safe_zone_model.dart';
+import '../../core/services/location_service.dart';
+import '../../core/utils/error_handler.dart';
 
 class SafeZoneController extends GetxController {
+  final SafeZoneRepository _safeZoneRepository = Get.find<SafeZoneRepository>();
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
+  final LocationService _locationService = Get.find<LocationService>();
 
   final RxDouble radius = 500.0.obs;
+  final RxBool isLoading = false.obs;
 
   GoogleMapController? mapController;
 
@@ -29,30 +37,23 @@ class SafeZoneController extends GetxController {
   }
 
   Future<void> getCurrentLocation() async {
-
-    LocationPermission permission = await Geolocator.requestPermission();
-
-    if(permission == LocationPermission.denied ||
-       permission == LocationPermission.deniedForever) {
-      return;
+    try {
+      Position? position = await _locationService.getCurrentPosition();
+      if (position != null) {
+        center.value = LatLng(position.latitude, position.longitude);
+        mapController?.animateCamera(
+          CameraUpdate.newLatLng(center.value),
+        );
+        drawCircle();
+        addMarker();
+      }
+    } catch (e) {
+      ErrorHandler.showErrorSnackBar(e);
     }
-
-    Position position = await Geolocator.getCurrentPosition();
-
-    center.value = LatLng(position.latitude, position.longitude);
-
-    mapController?.animateCamera(
-      CameraUpdate.newLatLng(center.value),
-    );
-
-    drawCircle();
-    addMarker();
   }
 
   void drawCircle() {
-
     circles.clear();
-
     circles.add(
       Circle(
         circleId: const CircleId("safe_zone"),
@@ -66,9 +67,7 @@ class SafeZoneController extends GetxController {
   }
 
   void addMarker() {
-
     markers.clear();
-
     markers.add(
       Marker(
         markerId: const MarkerId("marker"),
@@ -87,7 +86,27 @@ class SafeZoneController extends GetxController {
     drawCircle();
   }
 
-  void confirmSafeZone() {
-    Get.offAllNamed(Routes.DASHBOARD);
+  Future<void> confirmSafeZone() async {
+    final userId = _authRepository.currentUser?.uid;
+    if (userId == null) return;
+
+    try {
+      isLoading.value = true;
+      final safeZone = SafeZoneModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: "Home Safe Zone", // Default name, could be dynamic
+        latitude: center.value.latitude,
+        longitude: center.value.longitude,
+        radius: radius.value,
+        createdAt: DateTime.now(),
+      );
+
+      await _safeZoneRepository.addSafeZone(userId, safeZone);
+      Get.offAllNamed(Routes.DASHBOARD);
+    } catch (e) {
+      ErrorHandler.showErrorSnackBar(e);
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

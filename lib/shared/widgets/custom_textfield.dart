@@ -32,8 +32,8 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? onComplete;
   final String? Function(String?)? onSaved;
   final String? Function()? onEditingComplete;
-  double? textFieldheight;
-  TextAlign? textAlign;
+  final double? textFieldheight;
+  final TextAlign? textAlign;
   final String? Function(String?)? validator;
 
   final RxBool? obscureText; // ✅ Same as second field

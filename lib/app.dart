@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_constants.dart';
 import 'routes/app_pages.dart';
+import 'core/bindings/initial_binding.dart';
 
 class AutismCareApp extends StatelessWidget {
   const AutismCareApp({super.key});
@@ -19,6 +20,7 @@ class AutismCareApp extends StatelessWidget {
           title: AppStrings.appName,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
+          initialBinding: InitialBinding(),
           initialRoute: AppPages.initial,
           getPages: AppPages.routes,
           defaultTransition: Transition.cupertino,

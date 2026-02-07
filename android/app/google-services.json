@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "935192493994",
+    "project_id": "blue-circle-3166e",
+    "storage_bucket": "blue-circle-3166e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935192493994:android:0a32d3e10ecc22200e35d3",
+        "android_client_info": {
+          "package_name": "com.example.autismcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935192493994-3esa8jd2i8f3gsf67lr5ui6qba3psso6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuwJIgesCLNzp4FDNdN-kS1vxR6gbGkvA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935192493994-3esa8jd2i8f3gsf67lr5ui6qba3psso6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

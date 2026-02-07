@@ -26,8 +26,8 @@ class SafeZoneView extends GetView<SafeZoneController> {
                   zoom: 15,
                 ),
                 onMapCreated: controller.onMapCreated,
-                circles: controller.circles.value,
-                markers: controller.markers.value,
+                circles: controller.circles.toSet(),
+                markers: controller.markers.toSet(),
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
               )),
@@ -60,7 +60,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 20,
                       offset: const Offset(0, -5),
                     ),
@@ -140,6 +140,16 @@ class SafeZoneView extends GetView<SafeZoneController> {
               );
             },
           ),
+          
+          /// ================= LOADING INDICATOR =================
+          Obx(() => controller.isLoading.value
+              ? Container(
+                  color: Colors.black26,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : const SizedBox.shrink()),
         ],
       ),
     );

@@ -59,7 +59,7 @@ class EditProfileView extends GetView<EditProfileController> {
           Center(
             child: CircleAvatar(
               radius: 50.r,
-              backgroundColor: AppColors.primary.withOpacity(.1),
+              backgroundColor: AppColors.primary.withValues(alpha: .1),
               child: Icon(Icons.person, size: 40.sp, color: AppColors.primary),
             ),
           ),

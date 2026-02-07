@@ -16,7 +16,7 @@ class CommunityPostCard extends StatelessWidget {
     required this.timeAgo,
     required this.content,
     required this.likes,
-    required this.comments,
+    required this.comments, required Future<void> Function() onLike,
   });
 
   @override
