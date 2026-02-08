@@ -100,7 +100,7 @@ class HomeView extends GetView<HomeController> {
 
                   SizedBox(height: 24.h),
 
-                  // Large Button: Find Quiet Places
+      
                   PrimaryIconButton(
                     text: "Find Quiet Places",
                     icon: Icons.location_on_sharp,
@@ -112,7 +112,7 @@ class HomeView extends GetView<HomeController> {
 
                   SizedBox(height: 16.h),
 
-                  // Two row buttons
+        
                   _buildSmallActionButton(
                     icon: Icons.chat_bubble_outline,
                     label: "Open Community",
@@ -154,7 +154,7 @@ class HomeView extends GetView<HomeController> {
               ),
             ),
 
-            // Nearby places cards
+         
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: const Column(

@@ -2,6 +2,8 @@ class UserModel {
   final String id;
   final String name;
   final String email;
+  final String? phone;
+  final String? emergencyContact;
   final String? profileImage;
   final String? childName;
   final DateTime? childDob;
@@ -12,13 +14,17 @@ class UserModel {
   final String? preferredTextSize;
   final String? primaryChallenge;
   final List<String>? safeZones;
+  final List<String>? favorites;
   final Map<String, dynamic>? childSafetySettings;
   final DateTime createdAt;
+  final DateTime? deletedAt;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
+    this.phone,
+    this.emergencyContact,
     this.profileImage,
     this.childName,
     this.childDob,
@@ -29,8 +35,10 @@ class UserModel {
     this.preferredTextSize,
     this.primaryChallenge,
     this.safeZones,
+    this.favorites,
     this.childSafetySettings,
     required this.createdAt,
+    this.deletedAt,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map, String documentId) {
@@ -38,6 +46,8 @@ class UserModel {
       id: documentId,
       name: map['name'] ?? '',
       email: map['email'] ?? '',
+      phone: map['phone'],
+      emergencyContact: map['emergencyContact'],
       profileImage: map['profileImage'],
       childName: map['childName'],
       childDob: map['childDob'] != null ? DateTime.fromMillisecondsSinceEpoch(map['childDob']) : null,
@@ -49,9 +59,11 @@ class UserModel {
       primaryChallenge: map['primaryChallenge'],
       safeZones: map['safeZones'] != null ? List<String>.from(map['safeZones']) : null,
       childSafetySettings: map['childSafetySettings'],
+      favorites: map['favorites'] != null ? List<String>.from(map['favorites']) : null,
       createdAt: map['createdAt'] != null 
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt']) 
           : DateTime.now(),
+      deletedAt: map['deletedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['deletedAt']) : null,
     );
   }
 
@@ -59,6 +71,8 @@ class UserModel {
     return {
       'name': name,
       'email': email,
+      'phone': phone,
+      'emergencyContact': emergencyContact,
       'profileImage': profileImage,
       'childName': childName,
       'childDob': childDob?.millisecondsSinceEpoch,
@@ -69,8 +83,10 @@ class UserModel {
       'preferredTextSize': preferredTextSize,
       'primaryChallenge': primaryChallenge,
       'safeZones': safeZones,
+      'favorites': favorites,
       'childSafetySettings': childSafetySettings,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'deletedAt': deletedAt?.millisecondsSinceEpoch,
     };
   }
 
@@ -78,6 +94,8 @@ class UserModel {
     String? id,
     String? name,
     String? email,
+    String? phone,
+    String? emergencyContact,
     String? profileImage,
     String? childName,
     DateTime? childDob,
@@ -90,11 +108,14 @@ class UserModel {
     List<String>? safeZones,
     Map<String, dynamic>? childSafetySettings,
     DateTime? createdAt,
+    DateTime? deletedAt,
   }) {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
+      phone: phone ?? this.phone,
+      emergencyContact: emergencyContact ?? this.emergencyContact,
       profileImage: profileImage ?? this.profileImage,
       childName: childName ?? this.childName,
       childDob: childDob ?? this.childDob,
@@ -105,8 +126,10 @@ class UserModel {
       preferredTextSize: preferredTextSize ?? this.preferredTextSize,
       primaryChallenge: primaryChallenge ?? this.primaryChallenge,
       safeZones: safeZones ?? this.safeZones,
+      favorites: favorites ?? this.favorites,
       childSafetySettings: childSafetySettings ?? this.childSafetySettings,
       createdAt: createdAt ?? this.createdAt,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 }

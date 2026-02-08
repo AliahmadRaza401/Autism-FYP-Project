@@ -21,4 +21,16 @@ class AuthRepository {
   Future<void> signOut() async {
     await _authService.signOut();
   }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _authService.sendPasswordResetEmail(email);
+  }
+
+  Future<void> sendEmailVerification() async {
+    await _authService.sendEmailVerification();
+  }
+
+  Future<void> deleteAccount() async {
+    await _authService.deleteAccount();
+  }
 }

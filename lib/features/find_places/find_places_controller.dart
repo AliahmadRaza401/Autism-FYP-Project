@@ -20,10 +20,17 @@ class FindPlacesController extends GetxController {
     dev.log('FindPlacesController Initialized', name: 'FIND_PLACES_DEBUG');
     _fetchPlaces();
     
-    // Listen to category changes to re-fetch
+   
     ever(selectedCategory, (category) {
       dev.log('Category filter changed: $category', name: 'FIND_PLACES_DEBUG');
       _fetchPlaces();
+    });
+
+    searchController.addListener(() {
+      debounce(RxString(searchController.text), (value) {
+        dev.log('Searching for: $value', name: 'FIND_PLACES_DEBUG');
+        _fetchPlaces();
+      }, time: const Duration(milliseconds: 500));
     });
   }
 

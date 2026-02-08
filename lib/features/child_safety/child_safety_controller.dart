@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/user_repository.dart';
-import '../../data/models/user_model.dart';
+
 import '../../core/utils/error_handler.dart';
 
 class ChildSafetyController extends GetxController {

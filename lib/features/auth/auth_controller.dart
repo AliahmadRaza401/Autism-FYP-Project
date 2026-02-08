@@ -142,4 +142,64 @@ class AuthController extends GetxController {
       ErrorHandler.showErrorSnackBar(e);
     }
   }
+
+  Future<void> forgotPassword() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      Get.snackbar('Error', 'Please enter your email address to reset password');
+      return;
+    }
+
+    if (!GetUtils.isEmail(email)) {
+      Get.snackbar('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      dev.log('Sending Password Reset Email to: $email', name: 'AUTH_DEBUG');
+      await _authRepository.sendPasswordResetEmail(email);
+      ErrorHandler.showSuccessSnackBar(
+        'Email Sent', 
+        'Password reset link has been sent to your email.'
+      );
+    } catch (e) {
+      dev.log('Password Reset Failed: $e', name: 'AUTH_DEBUG', error: e);
+      ErrorHandler.showErrorSnackBar(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      isLoading.value = true;
+      dev.log('Attempting Account Deletion', name: 'AUTH_DEBUG');
+      await _authRepository.deleteAccount();
+      dev.log('Account Deleted Successfully', name: 'AUTH_DEBUG');
+      Get.offAllNamed(Routes.SIGN_IN);
+      ErrorHandler.showSuccessSnackBar('Account Deleted', 'Your account has been permanently removed.');
+    } catch (e) {
+      dev.log('Account Deletion Failed: $e', name: 'AUTH_DEBUG', error: e);
+      ErrorHandler.showErrorSnackBar(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> sendEmailVerification() async {
+    try {
+      dev.log('Sending Email Verification', name: 'AUTH_DEBUG');
+      await _authRepository.sendEmailVerification();
+      ErrorHandler.showSuccessSnackBar(
+        'Verification Sent', 
+        'A verification email has been sent to your inbox.'
+      );
+    } catch (e) {
+      dev.log('Email Verification Failed: $e', name: 'AUTH_DEBUG', error: e);
+      ErrorHandler.showErrorSnackBar(e);
+    }
+  }
+
+  bool get isEmailVerified => _authRepository.currentUser?.emailVerified ?? false;
 }

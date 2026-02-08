@@ -21,7 +21,7 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  /// HEADER
+
   Widget _buildHeader() {
     return SafeArea(
       child: Padding(
@@ -42,7 +42,7 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  /// BODY
+
   Widget _buildBody() {
     return Container(
       width: double.infinity,
@@ -113,7 +113,7 @@ class ProfileView extends GetView<ProfileController> {
           ),
           SizedBox(height: 16.h),
 
-          /// EDIT BUTTON
+   
           GestureDetector(
             onTap: controller.onEditProfileTap,
             child: Container(
@@ -132,7 +132,7 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  /// OPTION CARD
+  
   Widget _optionCard(IconData icon, String title) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
@@ -149,7 +149,6 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  /// CHILD PROFILE
   Widget _childProfileCard() {
     return Container(
       padding: EdgeInsets.all(20.w),
@@ -185,7 +184,6 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  /// SIGN OUT
   Widget _signOutCard() {
     return GestureDetector(
       onTap: controller.onLogout,
@@ -204,7 +202,7 @@ class ProfileView extends GetView<ProfileController> {
     );
   }
 
-  /// CARD DECORATION
+  
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Colors.white,

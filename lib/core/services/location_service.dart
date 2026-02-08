@@ -26,12 +26,30 @@ class LocationService extends GetxService {
     return await Geolocator.getCurrentPosition();
   }
 
+  Future<LocationPermission> requestBackgroundPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.whileInUse) {
+      permission = await Geolocator.requestPermission();
+    }
+    return permission;
+  }
+
+  Future<bool> isLocationPermissionGranted() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.always || permission == LocationPermission.whileInUse;
+  }
+
   Stream<Position> getPositionStream() {
+ 
     return Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: 10,
       ),
     );
+  }
+
+  double calculateDistance(double startLat, double startLng, double endLat, double endLng) {
+    return Geolocator.distanceBetween(startLat, startLng, endLat, endLng);
   }
 }

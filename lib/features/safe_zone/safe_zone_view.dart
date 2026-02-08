@@ -19,7 +19,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
       body: Stack(
         children: [
 
-          /// ================= GOOGLE MAP =================
+
           Obx(() => GoogleMap(
                 initialCameraPosition: CameraPosition(
                   target: controller.center.value,
@@ -32,7 +32,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
                 myLocationButtonEnabled: false,
               )),
 
-          /// ================= GPS FLOATING BUTTON =================
+
           Positioned(
             right: 20,
             bottom: 180,
@@ -44,7 +44,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
             ),
           ),
 
-          /// ================= DRAGGABLE BOTTOM SHEET =================
+       
           DraggableScrollableSheet(
             initialChildSize: 0.25,
             minChildSize: 0.15,
@@ -72,7 +72,6 @@ class SafeZoneView extends GetView<SafeZoneController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      /// Drag Handle
                       Center(
                         child: Container(
                           width: 80.w,
@@ -85,7 +84,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
                         ),
                       ),
 
-                      /// Title
+            
                       CText(
                         text: "Set range",
                         fontSize: 18,
@@ -95,7 +94,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
 
                       SizedBox(height: 20.h),
 
-                      /// Radius Labels
+                   
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -115,7 +114,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
 
                       SizedBox(height: 10.h),
 
-                      /// Radius Slider
+                 
                       Obx(() => Slider(
                             value: controller.radius.value,
                             min: 100,
@@ -127,7 +126,6 @@ class SafeZoneView extends GetView<SafeZoneController> {
 
                       SizedBox(height: 20.h),
 
-                      /// Confirm Button
                       PrimaryButton(
                         width: double.infinity,
                         text: "Confirm",
@@ -141,7 +139,7 @@ class SafeZoneView extends GetView<SafeZoneController> {
             },
           ),
           
-          /// ================= LOADING INDICATOR =================
+
           Obx(() => controller.isLoading.value
               ? Container(
                   color: Colors.black26,

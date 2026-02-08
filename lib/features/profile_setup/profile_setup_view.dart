@@ -1,4 +1,5 @@
 import 'package:autismcare/routes/app_pages.dart';
+import 'package:autismcare/shared/widgets/DOB_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                   ),
                   SizedBox(height: 24.h),
 
-                  // Profile Image Picker
+               
                   Center(
                     child: GestureDetector(
                       onTap: controller.pickImage,
@@ -72,7 +73,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                   ),
                   SizedBox(height: 24.h),
 
-                  // Child Details Card
+         
                   _buildSectionCard(
                     title: "Child Details",
                     children: [
@@ -82,14 +83,20 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                         controller: controller.childNameController,
                         textcolor: AppColors.textPrimary,
                       ),
-                      SizedBox(height: 12.h),
+                      // SizedBox(height: 12.h),
                       _buildFieldLabel("Date of Birth"),
-                      CustomTextField(
-                        hintText: "yyyy-mm-dd",
-                        controller: controller.dobController,
-                        keyboardType: TextInputType.datetime,
-                        textcolor: AppColors.textPrimary,
-                      ),
+                      DOBPickerField(
+controller: controller,
+  labelText: "Date of Birth",
+ 
+),
+
+                      // CustomTextField(
+                      //   hintText: "yyyy-mm-dd",
+                      //   controller: controller.dobController,
+                      //   keyboardType: TextInputType.datetime,
+                      //   textcolor: AppColors.textPrimary,
+                      // ),
                       SizedBox(height: 12.h),
                       _buildFieldLabel("Diagnosis (Optional)"),
                       CustomTextField(
@@ -102,33 +109,37 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
 
                   SizedBox(height: 16.h),
 
-                  // Primary Challenge
-                  _buildSectionCard(
-                    title: "Primary Challenge",
-                    children: [
-                      Obx(() => Wrap(
-                            spacing: 8.w,
-                            children: controller.challenges.map((challenge) {
-                              final isSelected = controller.selectedChallenge.value == challenge;
-                              return ChoiceChip(
-                                label: Text(challenge),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  if (selected) controller.setChallenge(challenge);
-                                },
-                                selectedColor: AppColors.primary,
-                                labelStyle: TextStyle(
-                                  color: isSelected ? Colors.white : AppColors.textPrimary,
-                                ),
-                              );
-                            }).toList(),
-                          )),
-                    ],
+            
+                  SizedBox(
+                    width:double.infinity,
+                    child: _buildSectionCard(
+                      
+                      title: "Primary Challenge",
+                      children: [
+                        Obx(() => Wrap(
+                              spacing: 8.w,
+                              
+                              children: controller.challenges.map((challenge) {
+                                final isSelected = controller.selectedChallenge.value == challenge;
+                                return ChoiceChip(
+                                  label: Text(challenge),
+                                  selected: isSelected,
+                                  onSelected: (selected) {
+                                    if (selected) controller.setChallenge(challenge);
+                                  },
+                                  selectedColor: AppColors.primary,
+                                  labelStyle: TextStyle(
+                                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                                  ),
+                                );
+                              }).toList(),
+                            )),
+                      ],
+                    ),
                   ),
 
                   SizedBox(height: 16.h),
 
-                  // Sensory Preference Card
                   _buildSectionCard(
                     title: "Sensory Preference",
                     children: [
@@ -195,6 +206,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
   Widget _buildSectionCard({required String title, required List<Widget> children}) {
     return Card(
       color: Colors.white,
+      
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       child: Padding(

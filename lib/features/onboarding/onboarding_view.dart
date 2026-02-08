@@ -27,7 +27,7 @@ class OnboardingView extends GetView<OnboardingController> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Icon/Image Area
+                
                         Container(
                           height: 120.w,
                           width: 120.w,
@@ -42,8 +42,7 @@ class OnboardingView extends GetView<OnboardingController> {
                           ),
                         ),
                         SizedBox(height: 40.h),
-                        
-                        // Title
+         
                         CText(
                           text: controller.onboardingData[index]["title"]!,
                           alignText: TextAlign.center,
@@ -53,8 +52,7 @@ class OnboardingView extends GetView<OnboardingController> {
                         ),
                         
                         SizedBox(height: 16.h),
-                        
-                        // Subtitle
+            
                         CText(
                           text: controller.onboardingData[index]["subtitle"]!,
                           alignText: TextAlign.center,
@@ -67,7 +65,7 @@ class OnboardingView extends GetView<OnboardingController> {
 
                         SizedBox(height: 32.h),
 
-                        // Indicators (Now below text)
+       
                         Obx(
                           () => Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -94,8 +92,7 @@ class OnboardingView extends GetView<OnboardingController> {
                 },
               ),
             ),
-            
-            // Bottom Buttons Area
+     
             Obx(() {
               final isFirstPage = controller.currentIndex == 0;
               final isLastPage = controller.currentIndex == controller.onboardingData.length - 1;

@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 class FirestoreService extends GetxService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Generic methods for Firestore operations
+  FirebaseFirestore get firestore => _db;
+
   Future<void> setData({
     required String path,
     required Map<String, dynamic> data,

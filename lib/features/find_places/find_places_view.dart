@@ -71,7 +71,7 @@ class FindPlacesView extends GetView<FindPlacesController> {
           ),
           SizedBox(height: 16.h),
 
-          // List of Places
+       
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
@@ -124,7 +124,7 @@ class FindPlacesView extends GetView<FindPlacesController> {
             fontWeight: FontWeight.w600,
             color: AppColors.textSecondary,
           ),
-          // Simple Category Filter (Horizontal)
+    
           SizedBox(width: 8.w),
           Expanded(
             child: SingleChildScrollView(

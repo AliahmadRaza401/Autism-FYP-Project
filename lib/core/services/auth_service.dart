@@ -22,10 +22,11 @@ class AuthService extends GetxService {
   Future<UserCredential> signIn(String email, String password) async {
     try {
       return await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: email.trim(),
+        password: password.trim(),
       );
     } catch (e) {
+        print(e.toString());
       rethrow;
     }
   }
@@ -36,5 +37,13 @@ class AuthService extends GetxService {
 
   Future<void> sendPasswordResetEmail(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> sendEmailVerification() async {
+    await _auth.currentUser?.sendEmailVerification();
+  }
+
+  Future<void> deleteAccount() async {
+    await _auth.currentUser?.delete();
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -28,6 +29,31 @@ class SafeZoneController extends GetxController {
   void onInit() {
     super.onInit();
     getCurrentLocation();
+    _startLocationTracking();
+  }
+
+  void _startLocationTracking() {
+    _locationService.getPositionStream().listen(
+      (Position position) {
+        // If we have an active safe zone view being configured
+        if (center.value.latitude != 0.0) {
+          final dist = _locationService.calculateDistance(
+            center.value.latitude, 
+            center.value.longitude, 
+            position.latitude, 
+            position.longitude
+          );
+
+          if (dist > radius.value) {
+            dev.log('OUTSIDE SAFE ZONE: $dist meters', name: 'SAFE_ZONE_DEBUG');
+          }
+        }
+      },
+      onError: (e) {
+        dev.log('Location Stream Error: $e', name: 'SAFE_ZONE_DEBUG');
+      },
+      cancelOnError: false,
+    );
   }
 
   void onMapCreated(GoogleMapController controller) {

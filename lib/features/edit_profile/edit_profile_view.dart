@@ -5,7 +5,6 @@ import '../../core/constants/app_constants.dart';
 
 import '../../shared/widgets/c_text.dart';
 import '../../shared/widgets/custom_buttons.dart';
-import '../../shared/widgets/custom_app_bar.dart';
 import '../../shared/widgets/custom_textfield.dart';
 import 'edit_profile_controller.dart';
 class EditProfileView extends GetView<EditProfileController> {
@@ -128,6 +127,7 @@ class EditProfileView extends GetView<EditProfileController> {
     );
   }
 
+  // ignore: unused_element
   Widget _input(TextEditingController controller, IconData icon) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),

@@ -9,19 +9,17 @@ class ErrorHandler {
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'user-not-found':
-          return 'No user found for that email.';
         case 'wrong-password':
-          return 'Wrong password provided for that user.';
-        case 'email-already-in-use':
-          return 'The email address is already in use by another account.';
-        case 'invalid-email':
-          return 'The email address is invalid.';
-        case 'weak-password':
-          return 'The password is too weak.';
-        case 'operation-not-allowed':
-          return 'Account creation with email and password is not enabled.';
         case 'invalid-credential':
-          return 'The supplied auth credential is incorrect, malformed or has expired.';
+          return 'Invalid email or password.';
+        case 'email-already-in-use':
+          return 'This email is already registered.';
+        case 'invalid-email':
+          return 'Please enter a valid email address.';
+        case 'weak-password':
+          return 'Your password is too weak.';
+        case 'operation-not-allowed':
+          return 'Login method not allowed. Contact support.';
         case 'too-many-requests':
           return 'Too many requests. Please try again later.';
         case 'network-request-failed':
@@ -48,12 +46,12 @@ class ErrorHandler {
   static void showErrorSnackBar(dynamic error) {
     final message = getErrorMessage(error);
     
-    // Log to console for development
+   
     dev.log(
       'ERROR: $message', 
       name: 'APP_ERROR', 
       error: error,
-      level: 1000, // Error level
+      level: 1000, 
     );
 
     Get.snackbar(
