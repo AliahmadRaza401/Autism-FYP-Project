@@ -59,7 +59,7 @@ class SignInView extends GetView<AuthController> {
                 ),
               ),
               CustomTextField(
-                hintText: "janetdoe@email.com",
+                hintText: "Mohammad@email.com",
                 preffixIcon: const Icon(Icons.email_outlined, color: AppColors.grey500),
                 controller: controller.emailController,
                 keyboardType: TextInputType.emailAddress,
