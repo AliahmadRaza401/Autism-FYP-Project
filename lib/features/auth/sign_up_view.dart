@@ -136,17 +136,21 @@ class SignUpView extends GetView<AuthController> {
                 isPassword: true,
   hasPreffix: true,
   hasSuffix: true,
-                controller: controller.passwordController,
+                controller: controller.confirmPasswordController,
                 textcolor: AppColors.textPrimary,
               ),
               SizedBox(height: 40.h),
-              PrimaryIconButton(
-                text: "Sign up",
-                onTap: controller.signUp,
-                icon: Icons.arrow_forward,
-                iconEnable: true,
-                width: double.infinity,
-              ),
+              Obx(
+  () => PrimaryIconButton(
+    text: "Sign Up",
+    icon: Icons.arrow_forward,
+    iconEnable: true,
+    width: double.infinity,
+    isLoading: controller.isLoading.value,
+    onTap: controller.signUp,
+  ),
+),
+
               SizedBox(height: 20.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

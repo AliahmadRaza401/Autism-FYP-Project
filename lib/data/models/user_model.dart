@@ -18,6 +18,8 @@ class UserModel {
   final Map<String, dynamic>? childSafetySettings;
   final DateTime createdAt;
   final DateTime? deletedAt;
+   final String? password;
+
 
   UserModel({
     required this.id,
@@ -26,6 +28,7 @@ class UserModel {
     this.phone,
     this.emergencyContact,
     this.profileImage,
+    this.password,
     this.childName,
     this.childDob,
     this.diagnosis,
@@ -57,6 +60,7 @@ class UserModel {
       lightSensitivity: (map['lightSensitivity'] as num?)?.toDouble(),
       preferredTextSize: map['preferredTextSize'],
       primaryChallenge: map['primaryChallenge'],
+      password: map['password'],
       safeZones: map['safeZones'] != null ? List<String>.from(map['safeZones']) : null,
       childSafetySettings: map['childSafetySettings'],
       favorites: map['favorites'] != null ? List<String>.from(map['favorites']) : null,
@@ -109,6 +113,7 @@ class UserModel {
     Map<String, dynamic>? childSafetySettings,
     DateTime? createdAt,
     DateTime? deletedAt,
+    String? password
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -130,6 +135,7 @@ class UserModel {
       childSafetySettings: childSafetySettings ?? this.childSafetySettings,
       createdAt: createdAt ?? this.createdAt,
       deletedAt: deletedAt ?? this.deletedAt,
+       password: password ?? this.password,
     );
   }
 }

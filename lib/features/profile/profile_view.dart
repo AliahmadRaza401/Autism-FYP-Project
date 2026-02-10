@@ -1,3 +1,4 @@
+import 'package:autismcare/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -28,7 +29,7 @@ class ProfileView extends GetView<ProfileController> {
         padding: EdgeInsets.all(16.w),
         child: Row(
           children: [
-            const Icon(Icons.arrow_back, color: Colors.white),
+            // const Icon(Icons.arrow_back, color: Colors.white),
             SizedBox(width: 12.w),
             CText(
               text: "Profile",
@@ -169,15 +170,20 @@ class ProfileView extends GetView<ProfileController> {
           ),
           SizedBox(height: 14.h),
 
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12.h),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.grey100,
-              borderRadius: BorderRadius.circular(12.r),
+          GestureDetector(
+            onTap: () {
+              Get.toNamed(Routes.PROFILE_SETUP);
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.grey100,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child:  CText(text: "Manage Child Profile", fontSize: 16.sp,),
             ),
-            child:  CText(text: "Manage Child Profile", fontSize: 16.sp,),
           ),
         ],
       ),

@@ -1,0 +1,18 @@
+Analyzing autismcare...                                         
+
+   info • Unnecessary 'this.' qualifier • lib/data/models/user_model.dart:134:31 • unnecessary_this
+warning • The name ExtensionSnackbar is shown, but isn't used • lib/features/edit_profile/edit_profile_controller.dart:11:36 • unused_shown_name
+warning • Dead code • lib/features/edit_profile/edit_profile_controller.dart:47:42 • dead_code
+warning • The left operand can't be null, so the right operand is never executed • lib/features/edit_profile/edit_profile_controller.dart:47:45 • dead_null_aware_expression
+warning • Unused import: 'dart:io' • lib/features/edit_profile/edit_profile_view.dart:1:8 • unused_import
+  error • Undefined name 'Routes' • lib/features/profile/profile_view.dart:175:27 • undefined_identifier
+   info • Don't invoke 'print' in production code • lib/features/profile_setup/profile_setup_controller.dart:66:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/profile_setup/profile_setup_controller.dart:93:7 • avoid_print
+warning • Unused import: 'dart:io' • lib/features/profile_setup/profile_setup_view.dart:1:8 • unused_import
+   info • 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre • lib/features/profile_setup/profile_setup_view.dart:244:11 • deprecated_member_use
+   info • 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre • lib/features/profile_setup/profile_setup_view.dart:245:11 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/profile_setup/profile_setup_view.dart:286:47 • deprecated_member_use
+   info • The file name 'DOB_picker.dart' isn't a lower_case_with_underscores identifier • lib/shared/widgets/DOB_picker.dart:1:1 • file_names
+   info • Parameter 'key' could be a super parameter • lib/shared/widgets/DOB_picker.dart:9:9 • use_super_parameters
+
+14 issues found. (ran in 3.9s)

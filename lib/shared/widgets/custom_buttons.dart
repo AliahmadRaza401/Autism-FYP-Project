@@ -67,12 +67,12 @@ class PrimaryButton extends StatelessWidget {
     );
   }
 }
-
 class PrimaryIconButton extends StatelessWidget {
   final String text;
-  final Function() onTap;
-  final IconData icon;
+  final Function()? onTap;
+  final IconData? icon;
   final bool iconEnable;
+  final bool isLoading; 
   final double? height;
   final double? width;
   final double? textSize;
@@ -85,8 +85,9 @@ class PrimaryIconButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onTap,
-    required this.icon,
+    this.icon,
     this.iconEnable = false,
+    this.isLoading = false,
     this.height,
     this.width,
     this.color,
@@ -99,40 +100,49 @@ class PrimaryIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       child: Container(
-        width: width ?? 327.w,
-        height: height ?? 52.h,
+        width: width ?? double.infinity,
+        height: height ?? 52,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: color ?? AppColors.primary,
-          border: Border.all(color: AppColors.primary),
-          borderRadius: BorderRadius.circular(radius ?? 8.32.r),
+          color: color ?? Colors.blue,
+          border: Border.all(color: color ?? Colors.blue),
+          borderRadius: BorderRadius.circular(radius ?? 8),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CText(
-              text: text,
-              fontSize: textSize ?? 18,
-              fontWeight: FontWeight.w600,
-              color: tcolor ?? AppColors.kwhite,
-            ),
-            if (iconEnable) ...[
-              const SizedBox(width: 5),
-              Icon(
-                icon,
-                color: iconColor ?? AppColors.kwhite,
-                size: 20,
+        child: isLoading
+            ? SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: tcolor ?? Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    text,
+                    style: TextStyle(
+                      color: tcolor ?? Colors.white,
+                      fontSize: textSize ?? 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (iconEnable && icon != null) ...[
+                    const SizedBox(width: 5),
+                    Icon(icon, color: iconColor ?? Colors.white, size: 20),
+                  ],
+                ],
               ),
-            ],
-          ],
-        ),
       ),
     );
   }
 }
+
+
 
 class PrimaryButton3 extends StatelessWidget {
   final String text;

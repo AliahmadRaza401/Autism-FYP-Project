@@ -1,4 +1,6 @@
 import 'dart:developer' as dev;
+import 'package:autismcare/core/utils/validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../routes/app_pages.dart';
@@ -13,6 +15,8 @@ class AuthController extends GetxController {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
   final TextEditingController nameController = TextEditingController();
   
   final RxBool isPasswordVisible = false.obs;
@@ -30,6 +34,7 @@ class AuthController extends GetxController {
     dev.log('AuthController Closed', name: 'AUTH_DEBUG');
     emailController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     nameController.dispose();
     super.onClose();
   }
@@ -43,94 +48,91 @@ class AuthController extends GetxController {
       isRememberMe.value = value;
     }
   }
+Future<void> signIn() async {
+  final email = emailController.text.trim();
+  final password = passwordController.text.trim();
 
-  Future<void> signIn() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+  final emailError = Validator.validateEmail(email);
+  final passError = Validator.validatePassword(password);
 
-    dev.log('Attempting Sign-In for: $email', name: 'AUTH_DEBUG');
+  if (emailError != null) return ErrorHandler.showErrorSnackBar(emailError);
+  if (passError != null) return ErrorHandler.showErrorSnackBar(passError);
 
-    if (email.isEmpty || password.isEmpty) {
-      Get.snackbar('Error', 'Please fill in all fields');
-      return;
+  try {
+    isLoading.value = true;
+    dev.log("SignIn started for: $email", name: "AUTH_CONTROLLER");
+
+    await _authRepository.signIn(email, password);
+
+    ErrorHandler.showSuccessSnackBar(
+      "Welcome Back",
+      "Login successful",
+    );
+
+    Get.offAllNamed(Routes.DASHBOARD);
+  } on FirebaseAuthException catch (e) {
+    String message;
+    switch (e.code) {
+      case 'user-not-found':
+        message = "No user found for this email";
+        break;
+      case 'wrong-password':
+        message = "Incorrect password";
+        break;
+      case 'invalid-email':
+        message = "Invalid email address";
+        break;
+      case 'user-disabled':
+        message = "This user account has been disabled";
+        break;
+      default:
+        message = e.message ?? "Sign in failed. Try again";
     }
-
-    if (!GetUtils.isEmail(email)) {
-      Get.snackbar('Error', 'Please enter a valid email address');
-      return;
-    }
-
-    if (password.length < 6) {
-      Get.snackbar('Error', 'Password must be at least 6 characters long');
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-      await _authRepository.signIn(email, password);
-      
-      dev.log('Sign-In Successful: $email', name: 'AUTH_DEBUG');
-      ErrorHandler.showSuccessSnackBar('Welcome Back!', 'You have successfully signed in.');
-      Get.offAllNamed(Routes.DASHBOARD);
-    } catch (e) {
-      dev.log('Sign-In Failed: $e', name: 'AUTH_DEBUG', error: e);
-      ErrorHandler.showErrorSnackBar(e);
-    } finally {
-      isLoading.value = false;
-    }
+    ErrorHandler.showErrorSnackBar(message);
+  } catch (e) {
+    dev.log("SignIn Failed: $e", name: "AUTH_CONTROLLER", error: e);
+    ErrorHandler.showErrorSnackBar(e.toString());
+  } finally {
+    isLoading.value = false;
   }
+}
 
-  Future<void> signUp() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-    final name = nameController.text.trim();
+Future<void> signUp() async {
+  final email = emailController.text.trim();
+  final password = passwordController.text.trim();
+  final confirmPassword = confirmPasswordController.text.trim();
+  final name = nameController.text.trim();
 
-    dev.log('Attempting Sign-Up for: $email', name: 'AUTH_DEBUG');
+  final nameError = Validator.validateName(name);
+  final emailError = Validator.validateEmail(email);
+  final passError = Validator.validatePassword(password);
+  final confirmPassError = Validator.validateConfirmPassword(password, confirmPassword);
 
-    if (email.isEmpty || password.isEmpty || name.isEmpty) {
-      Get.snackbar('Error', 'Please fill in all fields');
-      return;
-    }
+  if (nameError != null) return ErrorHandler.showErrorSnackBar(nameError);
+  if (emailError != null) return ErrorHandler.showErrorSnackBar(emailError);
+  if (passError != null) return ErrorHandler.showErrorSnackBar(passError);
+  if (confirmPassError != null) return ErrorHandler.showErrorSnackBar(confirmPassError);
 
-    if (name.length < 2) {
-      Get.snackbar('Error', 'Name must be at least 2 characters long');
-      return;
-    }
+  try {
+    isLoading.value = true;
+    final userCredential = await _authRepository.signUp(email, password);
 
-    if (!GetUtils.isEmail(email)) {
-      Get.snackbar('Error', 'Please enter a valid email address');
-      return;
-    }
+    final newUser = UserModel(
+      id: userCredential.user!.uid,
+      name: name,
+      email: email,
+      createdAt: DateTime.now(),
+    );
 
-    if (password.length < 6) {
-      Get.snackbar('Error', 'Password must be at least 6 characters long');
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-      final userCredential = await _authRepository.signUp(email, password);
-
-      if (userCredential.user != null) {
-        final newUser = UserModel(
-          id: userCredential.user!.uid,
-          name: name,
-          email: email,
-          createdAt: DateTime.now(),
-        );
-        await _userRepository.createUser(newUser);
-        
-        dev.log('Sign-Up Successful: $email', name: 'AUTH_DEBUG');
-        ErrorHandler.showSuccessSnackBar('Welcome!', 'Your account has been created successfully.');
-        Get.offNamed(Routes.PROFILE_SETUP);
-      }
-    } catch (e) {
-      dev.log('Sign-Up Failed: $e', name: 'AUTH_DEBUG', error: e);
-      ErrorHandler.showErrorSnackBar(e);
-    } finally {
-      isLoading.value = false;
-    }
+    await _userRepository.createUser(newUser);
+    ErrorHandler.showSuccessSnackBar("Account Created", "Welcome to AutismCare");
+    Get.offNamed(Routes.PROFILE_SETUP);
+  } catch (e) {
+    ErrorHandler.showErrorSnackBar(e);
+  } finally {
+    isLoading.value = false;
   }
+}
 
   Future<void> logout() async {
     dev.log('User Logging Out', name: 'AUTH_DEBUG');
@@ -203,3 +205,5 @@ class AuthController extends GetxController {
 
   bool get isEmailVerified => _authRepository.currentUser?.emailVerified ?? false;
 }
+
+

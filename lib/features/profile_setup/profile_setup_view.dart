@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:autismcare/routes/app_pages.dart';
 import 'package:autismcare/shared/widgets/DOB_picker.dart';
 import 'package:flutter/material.dart';
@@ -39,41 +40,52 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                   ),
                   SizedBox(height: 24.h),
 
-               
                   Center(
                     child: GestureDetector(
                       onTap: controller.pickImage,
-                      child: Obx(() => Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 50.r,
-                                backgroundColor: AppColors.grey200,
-                                backgroundImage: controller.profileImage.value != null
-                                    ? FileImage(controller.profileImage.value!)
-                                    : null,
-                                child: controller.profileImage.value == null
-                                    ? Icon(Icons.person, size: 50.r, color: AppColors.grey400)
-                                    : null,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: EdgeInsets.all(4.r),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(Icons.camera_alt, size: 16.r, color: Colors.white),
+                      child: Obx(
+                        () => Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50.r,
+                              backgroundColor: AppColors.grey200,
+                              backgroundImage:
+                                  controller.profileImage.value != null
+                                  ? FileImage(controller.profileImage.value!)
+                                  : null,
+                              child: controller.profileImage.value == null
+                                  ? Icon(
+                                      Icons.person,
+                                      size: 50.r,
+                                      color: AppColors.grey400,
+                                    )
+                                  : null,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(4.r),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  size: 16.r,
+                                  color: Colors.white,
                                 ),
                               ),
-                            ],
-                          )),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
+
                   SizedBox(height: 24.h),
 
-         
+          
                   _buildSectionCard(
                     title: "Child Details",
                     children: [
@@ -83,21 +95,11 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                         controller: controller.childNameController,
                         textcolor: AppColors.textPrimary,
                       ),
-                      // SizedBox(height: 12.h),
                       _buildFieldLabel("Date of Birth"),
                       DOBPickerField(
-controller: controller,
-  labelText: "Date of Birth",
- 
-),
-
-                      // CustomTextField(
-                      //   hintText: "yyyy-mm-dd",
-                      //   controller: controller.dobController,
-                      //   keyboardType: TextInputType.datetime,
-                      //   textcolor: AppColors.textPrimary,
-                      // ),
-                      SizedBox(height: 12.h),
+                        controller: controller,
+                        labelText: "Date of Birth",
+                      ),
                       _buildFieldLabel("Diagnosis (Optional)"),
                       CustomTextField(
                         hintText: "Enter diagnosis",
@@ -109,59 +111,75 @@ controller: controller,
 
                   SizedBox(height: 16.h),
 
-            
+                  // Primary Challenge
                   SizedBox(
-                    width:double.infinity,
+                    width: double.infinity,
                     child: _buildSectionCard(
-                      
                       title: "Primary Challenge",
                       children: [
-                        Obx(() => Wrap(
-                              spacing: 8.w,
-                              
-                              children: controller.challenges.map((challenge) {
-                                final isSelected = controller.selectedChallenge.value == challenge;
-                                return ChoiceChip(
-                                  label: Text(challenge),
-                                  selected: isSelected,
-                                  onSelected: (selected) {
-                                    if (selected) controller.setChallenge(challenge);
-                                  },
-                                  selectedColor: AppColors.primary,
-                                  labelStyle: TextStyle(
-                                    color: isSelected ? Colors.white : AppColors.textPrimary,
-                                  ),
-                                );
-                              }).toList(),
-                            )),
+                        Obx(
+                          () => Wrap(
+                            spacing: 8.w,
+                            children: controller.challenges.map((challenge) {
+                              final isSelected =
+                                  controller.selectedChallenge.value ==
+                                  challenge;
+                              return ChoiceChip(
+                                label: Text(challenge),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  if (selected)
+                                    controller.setChallenge(challenge);
+                                },
+                                selectedColor: AppColors.primary,
+                                labelStyle: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppColors.textPrimary,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
                       ],
                     ),
                   ),
 
                   SizedBox(height: 16.h),
 
+                  // Sensory Preferences
                   _buildSectionCard(
                     title: "Sensory Preference",
                     children: [
-                      _buildSlider("Noise Sensitivity", controller.noiseSensitivity),
+                      _buildSlider(
+                        "Noise Sensitivity",
+                        controller.noiseSensitivity,
+                      ),
                       SizedBox(height: 16.h),
-                      _buildSlider("Crowd Sensitivity", controller.crowdSensitivity),
+                      _buildSlider(
+                        "Crowd Sensitivity",
+                        controller.crowdSensitivity,
+                      ),
                       SizedBox(height: 16.h),
-                      _buildSlider("Light Sensitivity", controller.lightSensitivity),
+                      _buildSlider(
+                        "Light Sensitivity",
+                        controller.lightSensitivity,
+                      ),
                     ],
                   ),
 
                   SizedBox(height: 16.h),
 
+                  // Text Size
                   _buildSectionCard(
                     title: "Accessibility Settings",
                     children: [
                       _buildFieldLabel("Text Size"),
                       Column(
                         children: [
-                          _buildRadioOption("Small", "small", controller),
-                          _buildRadioOption("Medium", "medium", controller),
-                          _buildRadioOption("Large", "large", controller),
+                          _buildRadioOption("Small", "small"),
+                          _buildRadioOption("Medium", "medium"),
+                          _buildRadioOption("Large", "large"),
                         ],
                       ),
                     ],
@@ -190,23 +208,27 @@ controller: controller,
               ),
             ),
           ),
-          Obx(() => controller.isLoading.value
-              ? Container(
-                  color: Colors.black26,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : const SizedBox.shrink()),
+
+          // Loading overlay
+          Obx(
+            () => controller.isLoading.value
+                ? Container(
+                    color: Colors.black26,
+                    child: const Center(child: CircularProgressIndicator()),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionCard({required String title, required List<Widget> children}) {
+  Widget _buildSectionCard({
+    required String title,
+    required List<Widget> children,
+  }) {
     return Card(
       color: Colors.white,
-      
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       child: Padding(
@@ -240,21 +262,19 @@ controller: controller,
     );
   }
 
-  Widget _buildRadioOption(String label, String value, ProfileSetupController controller) {
-    return Obx(() => RadioListTile<String>(
-          title: CText(
-            text: label,
-            fontSize: 14,
-            color: AppColors.textPrimary,
-          ),
-          value: value,
-          groupValue: controller.selectedTextSize.value,
-          onChanged: (val) => controller.setTextSize(val!),
-          activeColor: AppColors.primary,
-          contentPadding: EdgeInsets.zero,
-          dense: true,
-          visualDensity: VisualDensity.compact,
-        ));
+  Widget _buildRadioOption(String label, String value) {
+    return Obx(
+      () => RadioListTile<String>(
+        title: CText(text: label, fontSize: 14, color: AppColors.textPrimary),
+        value: value,
+        groupValue: controller.selectedTextSize.value,
+        onChanged: (val) => controller.setTextSize(val!),
+        activeColor: AppColors.primary,
+        contentPadding: EdgeInsets.zero,
+        dense: true,
+        visualDensity: VisualDensity.compact,
+      ),
+    );
   }
 
   Widget _buildSlider(String label, RxDouble value) {
@@ -271,7 +291,11 @@ controller: controller,
             ),
             Obx(
               () => CText(
-                text: value.value < 33 ? "Low" : value.value < 66 ? "Medium" : "High",
+                text: value.value < 33
+                    ? "Low"
+                    : value.value < 66
+                    ? "Medium"
+                    : "High",
                 fontSize: 14,
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
@@ -290,7 +314,7 @@ controller: controller,
                 enabledThumbRadius: 10.r,
                 elevation: 2,
               ),
-              overlayColor: AppColors.primary.withValues(alpha: 0.1),
+              overlayColor: AppColors.primary.withOpacity(0.1),
             ),
             child: Slider(
               value: value.value,

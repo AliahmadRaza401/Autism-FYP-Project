@@ -105,13 +105,16 @@ class SignInView extends GetView<AuthController> {
               // ),
            
               SizedBox(height: 40.h),
-              PrimaryIconButton(
-                icon: Icons.arrow_forward,
-                iconEnable: true,
-                width: double.infinity,
-                           text: "Sign in",
-                onTap: controller.signIn,
-              ),
+ Obx(
+  () => PrimaryIconButton(
+    text: controller.isLoading.value ? "Signing in..." : "Sign In",
+    icon: Icons.arrow_forward,
+    iconEnable: !controller.isLoading.value,
+    width: double.infinity,
+    isLoading: controller.isLoading.value,
+    onTap: controller.signIn,
+  ),
+),
               // SizedBox(height: 24.h),
               // CText(
               //   text: "Forgot the password?",
