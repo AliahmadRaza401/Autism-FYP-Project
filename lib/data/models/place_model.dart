@@ -5,9 +5,13 @@ class PlaceModel {
   final String name;
   final String description;
   final String category;
-  final double latitude;
-  final double longitude;
-  final double safetyRating;
+  final GeoPoint location;
+  final String? address;
+  final bool staffFriendly;
+  final bool quietAvailable;
+  final Map<String, double> sensoryRatings;
+  final double overallRating;
+  final int reviewCount;
   final List<String> images;
 
   PlaceModel({
@@ -15,9 +19,13 @@ class PlaceModel {
     required this.name,
     required this.description,
     required this.category,
-    required this.latitude,
-    required this.longitude,
-    required this.safetyRating,
+    required this.location,
+    this.address,
+    this.staffFriendly = false,
+    this.quietAvailable = false,
+    this.sensoryRatings = const {},
+    this.overallRating = 0.0,
+    this.reviewCount = 0,
     required this.images,
   });
 
@@ -27,9 +35,13 @@ class PlaceModel {
       name: map['name'] ?? '',
       description: map['description'] ?? '',
       category: map['category'] ?? 'General',
-      latitude: (map['location'] as GeoPoint).latitude,
-      longitude: (map['location'] as GeoPoint).longitude,
-      safetyRating: (map['safetyRating'] as num?)?.toDouble() ?? 0.0,
+      location: map['location'] as GeoPoint? ?? const GeoPoint(0, 0),
+      address: map['address'],
+      staffFriendly: map['staffFriendly'] ?? false,
+      quietAvailable: map['quietAvailable'] ?? false,
+      sensoryRatings: Map<String, double>.from(map['sensoryRatings'] ?? {}),
+      overallRating: (map['overallRating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: map['reviewCount'] ?? 0,
       images: map['images'] != null ? List<String>.from(map['images']) : [],
     );
   }
@@ -39,8 +51,13 @@ class PlaceModel {
       'name': name,
       'description': description,
       'category': category,
-      'location': GeoPoint(latitude, longitude),
-      'safetyRating': safetyRating,
+      'location': location,
+      'address': address,
+      'staffFriendly': staffFriendly,
+      'quietAvailable': quietAvailable,
+      'sensoryRatings': sensoryRatings,
+      'overallRating': overallRating,
+      'reviewCount': reviewCount,
       'images': images,
     };
   }

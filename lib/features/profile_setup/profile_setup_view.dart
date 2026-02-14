@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:autismcare/routes/app_pages.dart';
 import 'package:autismcare/shared/widgets/DOB_picker.dart';
 import 'package:flutter/material.dart';
@@ -111,7 +110,6 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
 
                   SizedBox(height: 16.h),
 
-                  // Primary Challenge
                   SizedBox(
                     width: double.infinity,
                     child: _buildSectionCard(
@@ -147,7 +145,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
 
                   SizedBox(height: 16.h),
 
-                  // Sensory Preferences
+             
                   _buildSectionCard(
                     title: "Sensory Preference",
                     children: [
@@ -170,7 +168,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
 
                   SizedBox(height: 16.h),
 
-                  // Text Size
+        
                   _buildSectionCard(
                     title: "Accessibility Settings",
                     children: [
@@ -209,7 +207,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
             ),
           ),
 
-          // Loading overlay
+        
           Obx(
             () => controller.isLoading.value
                 ? Container(

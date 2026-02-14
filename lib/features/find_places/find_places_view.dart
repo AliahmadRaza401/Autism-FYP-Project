@@ -92,9 +92,12 @@ class FindPlacesView extends GetView<FindPlacesController> {
                   final place = controller.places[index];
                   return PlaceCard(
                     title: place.name,
-                    address: place.description,
-                    rating: place.safetyRating,
+                    address: place.address ?? place.description,
+                    rating: place.overallRating,
                     imagePath: place.images.isNotEmpty ? place.images.first : "",
+                    staffFriendly: place.staffFriendly,
+                    quietAvailable: place.quietAvailable,
+                    sensoryRatings: place.sensoryRatings,
                   );
                 },
               );

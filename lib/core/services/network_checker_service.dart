@@ -28,8 +28,7 @@ class NetworkCheckerService extends GetxService {
     if (results.isEmpty) {
       connectionStatus.value = ConnectivityResult.none;
     } else {
-      // In connectivity_plus 6.0.0+, it returns a list. 
-      // We'll take the first non-none if available.
+      
       connectionStatus.value = results.first;
     }
     

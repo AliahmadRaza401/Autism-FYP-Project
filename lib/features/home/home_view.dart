@@ -3,9 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
-import '../../shared/widgets/custom_buttons.dart';
-
-import '../../shared/widgets/place_card.dart';
+import '../../shared/widgets/custom_textfield.dart';
+import '../../routes/app_pages.dart';
 import 'home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -14,261 +13,340 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        toolbarHeight: 80.h,
-        centerTitle: false, 
-
-        title: Obx(() => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CText(
-              text: controller.currentUser.value != null 
-                  ? "Hello, ${controller.currentUser.value!.name.split(' ')[0]}" 
-                  : "Welcome Back,",
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ],
-        )),
-
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20.w),
-            child: CircleAvatar(
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
-              radius: 20.r,
-              child: const Icon(Icons.notifications_none, color: Colors.white),
+      backgroundColor: AppColors.primary,
+      body: Column(
+        children: [
+          _buildHeader(),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(30.r),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20.h),
+                  _buildCategoryChips(),
+                  SizedBox(height: 16.h),
+                  Expanded(child: _buildPostFeed()),
+                ],
+              ),
             ),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Get.toNamed(Routes.POST_CREATION),
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const CText(
+          text: "Create Post",
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
 
-      body: SingleChildScrollView(
+  Widget _buildHeader() {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top section with background curve or just white background below blue appbar
-            // Container(
-            //   height: 20.h,
-            //   decoration: const BoxDecoration(
-            //     color: AppColors.primary,
-            //     borderRadius: BorderRadius.only(
-            //       bottomLeft: Radius.circular(30),
-            //       bottomRight: Radius.circular(30),
-            //     ),
-            //   ),
-            // ),
+            const CText(
+              text: "Community Posts",
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            SizedBox(height: 16.h),
+            CustomTextField(
+              hintText: "Search posts...",
+              preffixIcon: Icon(Icons.search, color: AppColors.grey500),
+              controller: controller.searchController,
+              textcolor: AppColors.textPrimary,
+              hasPreffix: true,
+              backcolor: Colors.white.withValues(alpha: 0.15),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  Widget _buildCategoryChips() {
+    return Obx(() {
+      if (controller.categories.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return SizedBox(
+        height: 40.h,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            // All Posts chip
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                children: [
-                  SizedBox(height: 20.h),
-                  // Top Two Cards
-                  Row(
+              padding: EdgeInsets.only(right: 8.w),
+              child: ChoiceChip(
+                label: const CText(text: "All Posts", fontSize: 12),
+                selected: controller.selectedCategory.value == null,
+                onSelected: (_) => controller.clearCategoryFilter(),
+                selectedColor: AppColors.primary,
+                backgroundColor: AppColors.grey100,
+                labelStyle: TextStyle(
+                  color: controller.selectedCategory.value == null
+                      ? Colors.white
+                      : AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            // Category chips
+            ...controller.categories.map((category) {
+              final isSelected = controller.selectedCategory.value?.id == category.id;
+              return Padding(
+                padding: EdgeInsets.only(right: 8.w),
+                child: ChoiceChip(
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: _buildFeaturedCard(
-                          icon: Icons.search,
-                          title: "Find Places",
-                          subtitle: "Search nearby",
-                          onTap: controller.goToFindPlaces,
-                          iconColor: AppColors.primary,
-                          bgCircleColor: AppColors.primary.withValues(alpha: 0.15),
-                        ),
-                      ),
-
-                      SizedBox(width: 16.w),
-
-                      Expanded(
-                        child: _buildFeaturedCard(
-                          icon: Icons.people_outline,
-                          title: "Community",
-                          subtitle: "Connect",
-                          onTap: controller.goToCommunity,
-                          iconColor: AppColors.kgreen,
-                          bgCircleColor: AppColors.kgreen.withValues(alpha: 0.15),
-                        ),
-                      ),
+                      Text(category.icon, style: TextStyle(fontSize: 14.sp)),
+                      SizedBox(width: 4.w),
+                      CText(text: category.name, fontSize: 12),
                     ],
                   ),
-
-                  SizedBox(height: 24.h),
-
-      
-                  PrimaryIconButton(
-                    text: "Find Quiet Places",
-                    icon: Icons.location_on_sharp,
-                    iconEnable: true,
-                    radius: 20,
-                    width: double.infinity,
-                    onTap: controller.goToFindPlaces,
+                  selected: isSelected,
+                  onSelected: (_) => controller.selectCategory(category),
+                  selectedColor: AppColors.primary,
+                  backgroundColor: AppColors.grey100,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
                   ),
+                ),
+              );
+            }),
+          ],
+        ),
+      );
+    });
+  }
 
-                  SizedBox(height: 16.h),
+  Widget _buildPostFeed() {
+    return Obx(() {
+      final posts = controller.filteredPosts.isEmpty
+          ? controller.allPosts
+          : controller.filteredPosts;
 
-        
-                  _buildSmallActionButton(
-                    icon: Icons.chat_bubble_outline,
-                    label: "Open Community",
-                    onTap: controller.goToCommunity,
-                  ),
-                  SizedBox(height: 12.w),
-                  _buildSmallActionButton(
-                    icon: Icons.security,
-                    label: "Child Safety",
-                    onTap: controller.goToChildSafety,
-                  ),
-                ],
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (posts.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.post_add_outlined,
+                size: 64.sp,
+                color: AppColors.grey400,
               ),
-            ),
+              SizedBox(height: 16.h),
+              CText(
+                text: controller.selectedCategory.value != null
+                    ? "No posts in this category yet"
+                    : "No posts yet. Be the first to post!",
+                fontSize: 16,
+                color: AppColors.textSecondary,
+              ),
+            ],
+          ),
+        );
+      }
 
-            SizedBox(height: 32.h),
+      return RefreshIndicator(
+        onRefresh: controller.refreshPosts,
+        child: ListView.builder(
+          itemCount: posts.length,
+          padding: EdgeInsets.only(bottom: 80.h),
+          itemBuilder: (context, index) {
+            final post = posts[index];
+            return _buildPostCard(post);
+          },
+        ),
+      );
+    });
+  }
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CText(
-                    text: "Nearby Quiet Place",
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                  TextButton(
-                    onPressed: controller.goToFindPlaces,
-                    child: CText(
-                      text: "See All",
+  Widget _buildPostCard(post) {
+    // Find category for this post
+    final category = controller.categories.firstWhereOrNull(
+      (cat) => cat.id == post.categoryId,
+    );
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 20.r,
+                backgroundColor: AppColors.grey200,
+                backgroundImage: post.authorImage != null && post.authorImage!.isNotEmpty
+                    ? NetworkImage(post.authorImage!)
+                    : null,
+                child: post.authorImage == null || post.authorImage!.isEmpty
+                    ? Icon(Icons.person, color: AppColors.grey500)
+                    : null,
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CText(
+                      text: post.authorName ?? "Parent",
                       fontSize: 14,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                ],
+                    if (category != null)
+                      Row(
+                        children: [
+                          Text(category.icon, style: TextStyle(fontSize: 10.sp)),
+                          SizedBox(width: 4.w),
+                          CText(
+                            text: category.name,
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
               ),
-            ),
-
-         
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: const Column(
-                children: [
-                  PlaceCard(
-                    title: "Central Park",
-                    address: "0.5 mi away",
-                    rating: 4.8,
-                    imagePath: "",
-                  ),
-                  PlaceCard(
-                    title: "Garden",
-                    address: "1.2 mi away",
-                    rating: 4.5,
-                    imagePath: "",
-                  ),
-                ],
+              CText(
+                text: _getTimeAgo(post.createdAt),
+                fontSize: 11,
+                color: AppColors.textSecondary,
               ),
-            ),
-            SizedBox(height: 40.h),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeaturedCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    Color? iconColor,
-    Color? bgCircleColor,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: bgCircleColor ?? AppColors.primary.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: iconColor ?? AppColors.primary,
-                size: 24.sp,
-              ),
-            ),
-
+            ],
+          ),
+          SizedBox(height: 12.h),
+          
+          // Title
+          CText(
+            text: post.title,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+          SizedBox(height: 8.h),
+          
+          // Description
+          CText(
+            text: post.description,
+            fontSize: 14,
+            color: AppColors.textPrimary,
+            lineHeight: 1.5,
+          ),
+          
+          // Image
+          if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
             SizedBox(height: 12.h),
-
-            CText(
-              text: title,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-
-            CText(
-              text: subtitle,
-              fontSize: 12,
-              color: iconColor ?? AppColors.primary,
-              fontWeight: FontWeight.w500,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Image.network(
+                post.imageUrl!,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 150.h,
+                    color: AppColors.grey100,
+                    child: const Center(
+                      child: Icon(Icons.broken_image, color: AppColors.grey400),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
-        ),
+          
+          SizedBox(height: 12.h),
+          
+          // Actions
+          Row(
+            children: [
+              InkWell(
+                onTap: () => controller.likePost(post.id),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.favorite_border,
+                      size: 20.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                    SizedBox(width: 6.w),
+                    CText(
+                      text: post.likesCount.toString(),
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 24.w),
+              Row(
+                children: [
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    size: 20.sp,
+                    color: AppColors.textSecondary,
+                  ),
+                  SizedBox(width: 6.w),
+                  CText(
+                    text: post.commentCount.toString(),
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSmallActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(12.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: AppColors.grey200),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Icon(icon, size: 22.sp, color: AppColors.textPrimary),
-            SizedBox(width: 12.w),
-            CText(
-              text: label,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ],
-        ),
-      ),
-    );
+  String _getTimeAgo(DateTime dateTime) {
+    final difference = DateTime.now().difference(dateTime);
+    if (difference.inDays > 0) return "${difference.inDays}d ago";
+    if (difference.inHours > 0) return "${difference.inHours}h ago";
+    if (difference.inMinutes > 0) return "${difference.inMinutes}m ago";
+    return "Just now";
   }
 }

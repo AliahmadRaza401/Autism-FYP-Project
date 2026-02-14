@@ -25,6 +25,8 @@ import '../features/profile/profile_view.dart';
 import '../features/profile/profile_binding.dart';
 import '../features/edit_profile/edit_profile_view.dart';
 import '../features/edit_profile/edit_profile_binding.dart';
+import '../features/post_creation/post_creation_view.dart';
+import '../features/post_creation/post_creation_binding.dart';
 
 part 'app_routes.dart';
 
@@ -102,6 +104,11 @@ class AppPages {
       name: _Paths.DASHBOARD,
       page: () => const DashboardView(),
       binding: DashboardBinding(),
+    ),
+    GetPage(
+      name: _Paths.POST_CREATION,
+      page: () => const PostCreationView(),
+      binding: PostCreationBinding(),
     ),
   ];
 }

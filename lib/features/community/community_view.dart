@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
-import '../../shared/widgets/community_post_card.dart';
 import 'community_controller.dart';
 
 class CommunityView extends GetView<CommunityController> {
@@ -17,10 +16,9 @@ class CommunityView extends GetView<CommunityController> {
       backgroundColor: AppColors.primary,
       body: Column(
         children: [
-          /// HEADER
+        
           _buildHeader(),
 
-          /// BODY CONTAINER
           Expanded(
             child: Container(
               width: double.infinity,
@@ -31,48 +29,23 @@ class CommunityView extends GetView<CommunityController> {
                   top: Radius.circular(30.r),
                 ),
               ),
-              child: Obx(() => ListView(
-                    children: [
-                      _buildWelcomeCard(),
-                      SizedBox(height: 6.h),
-                      _buildBrowseGroups(),
-                      SizedBox(height: 24.h),
-                      CText(
-                        text: "Recent Posts",
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      SizedBox(height: 16.h),
-                      if (controller.posts.isEmpty)
-                        Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 40.h),
-                            child: CText(
-                              text: "No posts yet. Be the first to post!",
-                              color: AppColors.textSecondary, fontSize: 14.sp,
-                            ),
-                          ),
-                        )
-                      else
-                        ...controller.posts.map((post) => CommunityPostCard(
-                              userName: post.authorName,
-                              timeAgo: _getTimeAgo(post.createdAt),
-                              content: post.content,
-                              likes: post.likes.length,
-                              comments: post.commentCount,
-                              onLike: () => controller.likePost(post.id),
-                            )),
-                      SizedBox(height: 20.h),
-                    ],
-                  )),
+              child: ListView(
+                children: [
+                  _buildWelcomeCard(),
+                  SizedBox(height: 24.h),
+                  CText(
+                    text: "Community Groups",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  SizedBox(height: 16.h),
+                  _buildBrowseGroups(),
+                  SizedBox(height: 20.h),
+                ],
+              ),
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreatePostDialog,
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -85,48 +58,6 @@ class CommunityView extends GetView<CommunityController> {
     return "Just now";
   }
 
-  void _showCreatePostDialog() {
-    Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.all(24.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CText(
-              text: "Create a Post",
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-            SizedBox(height: 16.h),
-            CustomTextField(
-              controller: controller.postController,
-              hintText: "What's on your mind?",
-              maxLines: 4,
-              textcolor: AppColors.textPrimary,
-            ),
-            SizedBox(height: 24.h),
-            Obx(() => controller.isLoading.value
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: controller.createPost,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: Size(double.infinity, 50.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    child: const Text("Post", style: TextStyle(color: Colors.white)),
-                  )),
-          ],
-        ),
-      ),
-    );
-  }
 
   /// ================= HEADER =================
 
@@ -149,7 +80,7 @@ class CommunityView extends GetView<CommunityController> {
             ),
             SizedBox(height: 20.h),
 
-            /// SEARCH BAR
+            ///  ==============SEARCH BAR ======
             CustomTextField(
               hintText: "Search groups ...",
               preffixIcon: Icon(Icons.search, color: AppColors.grey500),
@@ -255,7 +186,7 @@ class CommunityView extends GetView<CommunityController> {
       ),
       child: Row(
         children: [
-          /// ICON
+        
           Container(
               height: 46.h,
               width: 46.h,
@@ -267,7 +198,7 @@ class CommunityView extends GetView<CommunityController> {
 
           SizedBox(width: 12.w),
 
-          /// TEXT
+       
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

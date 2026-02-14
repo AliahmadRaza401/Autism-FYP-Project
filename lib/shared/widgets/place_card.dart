@@ -9,6 +9,9 @@ class PlaceCard extends StatelessWidget {
   final double rating;
   final String imagePath; 
   final bool isOpen;
+  final bool staffFriendly;
+  final bool quietAvailable;
+  final Map<String, double> sensoryRatings;
 
   const PlaceCard({
     super.key,
@@ -17,6 +20,9 @@ class PlaceCard extends StatelessWidget {
     required this.rating,
     required this.imagePath,
     this.isOpen = true,
+    this.staffFriendly = false,
+    this.quietAvailable = false,
+    this.sensoryRatings = const {},
   });
 
   @override
@@ -99,17 +105,17 @@ class PlaceCard extends StatelessWidget {
             spacing: 8.w,
             runSpacing: 8.h,
             children: [
-              _buildTag("Noise: 2/5", Colors.green),
-              _buildTag("Crowd: 1/5", Colors.blue),
-              _buildTag("Light: 2/5", AppColors.kpurple),
+              if (sensoryRatings.containsKey('noise')) _buildTag("Noise: ${sensoryRatings['noise']?.toInt()}/5", Colors.green),
+              if (sensoryRatings.containsKey('crowd')) _buildTag("Crowd: ${sensoryRatings['crowd']?.toInt()}/5", Colors.blue),
+              if (sensoryRatings.containsKey('light')) _buildTag("Light: ${sensoryRatings['light']?.toInt()}/5", AppColors.kpurple),
             ],
           ),
           SizedBox(height: 8.h),
           Row(
             children: [
-              _buildStatusItem(Icons.check_circle, "Staff Friend", Colors.green),
-              SizedBox(width: 12.w),
-              _buildStatusItem(Icons.check_circle, "Quiet", Colors.blue),
+              if (staffFriendly) _buildStatusItem(Icons.check_circle, "Staff Friend", Colors.green),
+              if (staffFriendly && quietAvailable) SizedBox(width: 12.w),
+              if (quietAvailable) _buildStatusItem(Icons.check_circle, "Quiet", Colors.blue),
             ],
           ),
         ],

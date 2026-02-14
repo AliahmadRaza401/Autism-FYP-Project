@@ -1,48 +1,111 @@
+import 'dart:developer' as dev;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../dashboard/dashboard_controller.dart';
-import '../../routes/app_pages.dart';
+import '../../data/repositories/community_repository.dart';
+import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/auth_repository.dart';
-import '../../data/repositories/user_repository.dart';
-import '../../data/repositories/safe_zone_repository.dart';
-import '../../data/models/user_model.dart';
-import '../../data/models/safe_zone_model.dart';
+import '../../data/models/post_model.dart';
+import '../../data/models/category_model.dart';
+import '../../core/utils/error_handler.dart';
 
 class HomeController extends GetxController {
+  final CommunityRepository _communityRepository = Get.find<CommunityRepository>();
+  final CategoryRepository _categoryRepository = Get.find<CategoryRepository>();
   final AuthRepository _authRepository = Get.find<AuthRepository>();
-  final UserRepository _userRepository = Get.find<UserRepository>();
-  final SafeZoneRepository _safeZoneRepository = Get.find<SafeZoneRepository>();
 
-  final Rxn<UserModel> currentUser = Rxn<UserModel>();
-  final RxList<SafeZoneModel> safeZones = <SafeZoneModel>[].obs;
+
+  final TextEditingController searchController = TextEditingController();
+
+  
+  final RxList<PostModel> allPosts = <PostModel>[].obs;
+  final RxList<PostModel> filteredPosts = <PostModel>[].obs;
+  final RxList<CategoryModel> categories = <CategoryModel>[].obs;
+
+  
+  final Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
+
+  
   final RxBool isLoading = false.obs;
+  final RxBool isSearching = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _fetchUserData();
+    dev.log('HomeController Initialized', name: 'HOME_DEBUG');
+    
+    
+    allPosts.bindStream(_communityRepository.getPosts());
+    categories.bindStream(_categoryRepository.getCategories());
+    
+    ever(allPosts, (_) => _filterPosts());
+    ever(selectedCategory, (_) => _filterPosts());
+    
+    searchController.addListener(_onSearchChanged);
+    
+    _seedCategoriesIfNeeded();
   }
 
-  void _fetchUserData() {
-    final userId = _authRepository.currentUser?.uid;
-    if (userId != null) {
-      currentUser.bindStream(_userRepository.userStream(userId));
-      safeZones.bindStream(_safeZoneRepository.getSafeZones(userId));
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
+  }
+
+  Future<void> _seedCategoriesIfNeeded() async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (categories.isEmpty) {
+        dev.log('Seeding initial categories', name: 'HOME_DEBUG');
+        await _categoryRepository.seedCategories();
+      }
+    } catch (e) {
+      dev.log('Error seeding categories: $e', name: 'HOME_DEBUG');
     }
   }
 
-  void goToFindPlaces() {
-    Get.find<DashboardController>().changeTabIndex(1);
+  void _onSearchChanged() {
+    _filterPosts();
   }
 
-  void goToCommunity() {
-    Get.find<DashboardController>().changeTabIndex(2);
+  void _filterPosts() {
+    final query = searchController.text.toLowerCase();
+    List<PostModel> posts = allPosts.toList();
+
+    if (selectedCategory.value != null) {
+      posts = posts.where((post) => post.categoryId == selectedCategory.value!.id).toList();
+    }
+
+    if (query.isNotEmpty) {
+      posts = posts.where((post) {
+        return post.title.toLowerCase().contains(query) ||
+            post.description.toLowerCase().contains(query);
+      }).toList();
+    }
+
+    filteredPosts.value = posts;
   }
 
-  void goToChildSafety() {
-    Get.toNamed(Routes.CHILD_SAFETY);
+  void selectCategory(CategoryModel? category) {
+    selectedCategory.value = category;
   }
 
-  void goToProfile() {
-    Get.find<DashboardController>().changeTabIndex(3);
+  void clearCategoryFilter() {
+    selectedCategory.value = null;
+  }
+
+  Future<void> likePost(String postId) async {
+    final userId = _authRepository.currentUser?.uid;
+    if (userId == null) return;
+
+    try {
+      await _communityRepository.likePost(postId, userId);
+    } catch (e) {
+      dev.log('Error liking post: $e', name: 'HOME_DEBUG');
+      ErrorHandler.showErrorSnackBar(e);
+    }
+  }
+
+  Future<void> refreshPosts() async {
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 }

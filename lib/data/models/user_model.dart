@@ -16,6 +16,8 @@ class UserModel {
   final List<String>? safeZones;
   final List<String>? favorites;
   final Map<String, dynamic>? childSafetySettings;
+  final String? profileImageUrl;
+  final String role; // 'parent' | 'community_member'
   final DateTime createdAt;
   final DateTime? deletedAt;
    final String? password;
@@ -40,6 +42,8 @@ class UserModel {
     this.safeZones,
     this.favorites,
     this.childSafetySettings,
+    this.profileImageUrl,
+    this.role = 'parent',
     required this.createdAt,
     this.deletedAt,
   });
@@ -52,6 +56,8 @@ class UserModel {
       phone: map['phone'],
       emergencyContact: map['emergencyContact'],
       profileImage: map['profileImage'],
+      profileImageUrl: map['profileImageUrl'],
+      role: map['role'] ?? 'parent',
       childName: map['childName'],
       childDob: map['childDob'] != null ? DateTime.fromMillisecondsSinceEpoch(map['childDob']) : null,
       diagnosis: map['diagnosis'],
@@ -78,6 +84,8 @@ class UserModel {
       'phone': phone,
       'emergencyContact': emergencyContact,
       'profileImage': profileImage,
+      'profileImageUrl': profileImageUrl,
+      'role': role,
       'childName': childName,
       'childDob': childDob?.millisecondsSinceEpoch,
       'diagnosis': diagnosis,
@@ -101,6 +109,8 @@ class UserModel {
     String? phone,
     String? emergencyContact,
     String? profileImage,
+    String? profileImageUrl,
+    String? role,
     String? childName,
     DateTime? childDob,
     String? diagnosis,
@@ -110,10 +120,11 @@ class UserModel {
     String? preferredTextSize,
     String? primaryChallenge,
     List<String>? safeZones,
+    List<String>? favorites,
     Map<String, dynamic>? childSafetySettings,
     DateTime? createdAt,
     DateTime? deletedAt,
-    String? password
+    String? password,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -122,6 +133,8 @@ class UserModel {
       phone: phone ?? this.phone,
       emergencyContact: emergencyContact ?? this.emergencyContact,
       profileImage: profileImage ?? this.profileImage,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      role: role ?? this.role,
       childName: childName ?? this.childName,
       childDob: childDob ?? this.childDob,
       diagnosis: diagnosis ?? this.diagnosis,
@@ -135,7 +148,7 @@ class UserModel {
       childSafetySettings: childSafetySettings ?? this.childSafetySettings,
       createdAt: createdAt ?? this.createdAt,
       deletedAt: deletedAt ?? this.deletedAt,
-       password: password ?? this.password,
+      password: password ?? this.password,
     );
   }
 }
