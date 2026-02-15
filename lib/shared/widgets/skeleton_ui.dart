@@ -1,4 +1,4 @@
-import 'package:autismcare/core/constants/app_constants.dart';
+import 'package:bluecircle/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

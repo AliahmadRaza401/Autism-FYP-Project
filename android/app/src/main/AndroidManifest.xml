@@ -24,7 +24,7 @@
 
     
     <application
-        android:label="autismcare"
+        android:label="bluecircle"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

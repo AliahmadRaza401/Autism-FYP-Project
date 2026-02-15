@@ -1,5 +1,5 @@
-import 'package:autismcare/routes/app_pages.dart';
-import 'package:autismcare/shared/widgets/DOB_picker.dart';
+import 'package:bluecircle/routes/app_pages.dart';
+import 'package:bluecircle/shared/widgets/DOB_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

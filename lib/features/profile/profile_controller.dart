@@ -2,11 +2,11 @@
 
 import 'dart:developer' as dev;
 
-import 'package:autismcare/core/utils/error_handler.dart';
-import 'package:autismcare/data/models/user_model.dart';
-import 'package:autismcare/data/repositories/auth_repository.dart';
-import 'package:autismcare/data/repositories/user_repository.dart';
-import 'package:autismcare/routes/app_pages.dart';
+import 'package:bluecircle/core/utils/error_handler.dart';
+import 'package:bluecircle/data/models/user_model.dart';
+import 'package:bluecircle/data/repositories/auth_repository.dart';
+import 'package:bluecircle/data/repositories/user_repository.dart';
+import 'package:bluecircle/routes/app_pages.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';

@@ -1,12 +1,12 @@
 import 'dart:developer' as dev;
 import 'dart:io';
 
-import 'package:autismcare/core/services/storage_service.dart';
-import 'package:autismcare/core/utils/error_handler.dart';
-import 'package:autismcare/data/models/user_model.dart';
-import 'package:autismcare/data/repositories/auth_repository.dart';
-import 'package:autismcare/data/repositories/user_repository.dart';
-import 'package:autismcare/shared/widgets/app_toast.dart';
+import 'package:bluecircle/core/services/storage_service.dart';
+import 'package:bluecircle/core/utils/error_handler.dart';
+import 'package:bluecircle/data/models/user_model.dart';
+import 'package:bluecircle/data/repositories/auth_repository.dart';
+import 'package:bluecircle/data/repositories/user_repository.dart';
+import 'package:bluecircle/shared/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' show ExtensionSnackbar, GetNavigation;
 import 'package:get/get_core/src/get_main.dart';

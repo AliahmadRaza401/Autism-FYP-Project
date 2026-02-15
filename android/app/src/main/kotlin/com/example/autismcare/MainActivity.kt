@@ -1,4 +1,4 @@
-package com.example.autismcare
+package com.example.bluecircle
 
 import io.flutter.embedding.android.FlutterActivity
 

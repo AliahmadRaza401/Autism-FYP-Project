@@ -1,5 +1,5 @@
 import 'dart:developer' as dev;
-import 'package:autismcare/core/utils/validator.dart';
+import 'package:bluecircle/core/utils/validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -125,7 +125,7 @@ Future<void> signUp() async {
     );
 
     await _userRepository.createUser(newUser);
-    ErrorHandler.showSuccessSnackBar("Account Created", "Welcome to AutismCare");
+    ErrorHandler.showSuccessSnackBar("Account Created", "Welcome to bluecircle");
     Get.offNamed(Routes.PROFILE_SETUP);
   } catch (e) {
     ErrorHandler.showErrorSnackBar(e);

@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
     projectId: 'blue-circle-3166e',
     storageBucket: 'blue-circle-3166e.firebasestorage.app',
     iosClientId: '935192493994-slcs72fnu1kh4g3amg3dk5gb60as9o5j.apps.googleusercontent.com',
-    iosBundleId: 'com.example.autismcare',
+    iosBundleId: 'com.example.bluecircle',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -75,7 +75,7 @@ class DefaultFirebaseOptions {
     projectId: 'blue-circle-3166e',
     storageBucket: 'blue-circle-3166e.firebasestorage.app',
     iosClientId: '935192493994-slcs72fnu1kh4g3amg3dk5gb60as9o5j.apps.googleusercontent.com',
-    iosBundleId: 'com.example.autismcare',
+    iosBundleId: 'com.example.bluecircle',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
