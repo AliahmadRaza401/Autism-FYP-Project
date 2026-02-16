@@ -14,33 +14,29 @@ class ProfileSetupController extends GetxController {
   final AuthRepository _authRepository = Get.find<AuthRepository>();
   final StorageService _storageService = Get.find<StorageService>();
 
-  // Text Controllers
   final childNameController = TextEditingController();
   final dobController = TextEditingController();
   final diagnosisController = TextEditingController();
 
-  // Profile Image
+  
   final Rx<File?> profileImage = Rx<File?>(null);
 
-  // Loading state
+  
   final RxBool isLoading = false.obs;
 
-  // Challenge
+  
   final List<String> challenges = ['Social', 'Communication', 'Sensory', 'Behavioral'];
   final RxString selectedChallenge = 'Social'.obs;
 
-  // Sensory preferences (0 to 100)
+  
   final RxDouble noiseSensitivity = 50.0.obs;
   final RxDouble crowdSensitivity = 50.0.obs;
   final RxDouble lightSensitivity = 50.0.obs;
 
-  // Text size selection
+  
   final RxString selectedTextSize = 'medium'.obs;
 
-
-  final StorageService storageService = Get.find<StorageService>();
-
-  // Pick image from gallery
+  
   Future<void> pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -49,36 +45,52 @@ class ProfileSetupController extends GetxController {
     }
   }
 
-  // Upload profile image to Firebase Storage
-  Future<String?> uploadProfileImage() async {
+  
+  Future<String?> uploadProfileImage(String userId) async {
     if (profileImage.value == null) return null;
 
     try {
       isLoading.value = true;
-      final userId = FirebaseAuth.instance.currentUser!.uid;
-      final path = 'users/$userId/profile.jpg';
 
-      final url = await storageService.uploadFile(path: path, file: profileImage.value!);
-      isLoading.value = false;
-      return url;
+      final result = await _storageService.uploadImage(
+        file: profileImage.value!,
+        folder: "users/$userId",
+      );
+
+      final imageUrl = result["url"];
+      final imagePath = result["path"];
+
+      
+      await FirebaseFirestore.instance.collection("users").doc(userId).update({
+        "profileImageUrl": imageUrl,
+        "profileImagePath": imagePath,
+      });
+
+      return imageUrl;
     } catch (e) {
-      isLoading.value = false;
-      print("[APP_ERROR] Storage upload error: $e");
-      Get.snackbar("Upload Error", "Failed to upload image.");
+      print("[APP_ERROR] Profile upload error: $e");
       return null;
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  // Save profile info to Firestore
+  
   Future<void> saveProfile({
     required String name,
     required String email,
   }) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      Get.snackbar("Error", "User not authenticated");
+      return;
+    }
+
     try {
       isLoading.value = true;
-      final userId = FirebaseAuth.instance.currentUser!.uid;
 
-      String? imageUrl = await uploadProfileImage();
+      
+      final imageUrl = await uploadProfileImage(userId);
 
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'name': name,
@@ -86,25 +98,26 @@ class ProfileSetupController extends GetxController {
         'profileImage': imageUrl ?? '',
       }, SetOptions(merge: true));
 
-      isLoading.value = false;
       Get.snackbar("Success", "Profile updated successfully!");
     } catch (e) {
-      isLoading.value = false;
       print("[APP_ERROR] Firestore error: $e");
       Get.snackbar("Error", "Failed to save profile.");
+    } finally {
+      isLoading.value = false;
     }
   }
-  /// Set selected challenge
+
+  
   void setChallenge(String value) {
     selectedChallenge.value = value;
   }
 
-  /// Set selected text size
+  
   void setTextSize(String value) {
     selectedTextSize.value = value;
   }
 
-  /// Complete profile setup and save to Firebase
+  
   Future<void> completeSetup() async {
     final userId = _authRepository.currentUser?.uid;
     if (userId == null) {
@@ -130,16 +143,13 @@ class ProfileSetupController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Upload profile image if selected
+      
       String? imageUrl;
       if (profileImage.value != null) {
-        imageUrl = await _storageService.uploadFile(
-          path: 'profile_images/$userId.jpg',
-          file: profileImage.value!,
-        );
+        imageUrl = await uploadProfileImage(userId);
       }
 
-      // Prepare user data
+      
       final user = await _userRepository.getUser(userId);
       final updatedUser = user.copyWith(
         childName: childName,
@@ -153,13 +163,24 @@ class ProfileSetupController extends GetxController {
         // textSize: selectedTextSize.value,
       );
 
-      // Update in Firebase
+    
       await _userRepository.updateUser(updatedUser);
-      ErrorHandler.showSuccessSnackBar("Profile Setup Complete", "Your profile has been saved successfully");
+      ErrorHandler.showSuccessSnackBar(
+        "Profile Setup Complete",
+        "Your profile has been saved successfully"
+      );
     } catch (e) {
       ErrorHandler.showErrorSnackBar(e);
     } finally {
       isLoading.value = false;
     }
+  }
+
+  @override
+  void onClose() {
+    childNameController.dispose();
+    dobController.dispose();
+    diagnosisController.dispose();
+    super.onClose();
   }
 }

@@ -10,7 +10,7 @@ class OnboardingController extends GetxController {
 
   final List<Map<String, String>> onboardingData = [
     {
-      "title": "Find Autism-Friendly Places",
+      "title": "Find Blue Circle-Friendly Places",
       "subtitle": "Discover parks, sensory-friendly museums near you with detailed sensory ratings.",
       "image": "assets/images/onboarding1.svg" 
     },

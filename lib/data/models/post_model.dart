@@ -8,8 +8,11 @@ class PostModel {
   final String categoryId; // NEW: Category reference
   final String? authorName;
   final String? authorImage;
-  final String? imageUrl;
+  
   final GeoPoint? location;
+  final String? imageUrl;
+final String? imagePath;
+
   final String? address;
   final Map<String, double> sensoryRatings;
   final double overallRating;
@@ -27,6 +30,7 @@ class PostModel {
     required this.categoryId,
     this.authorName,
     this.authorImage,
+    this.imagePath,
     this.imageUrl,
     this.location,
     this.address,
@@ -49,6 +53,7 @@ class PostModel {
       authorName: map['authorName'],
       authorImage: map['authorImage'],
       imageUrl: map['imageUrl'],
+      imagePath: map['imagePath'],
       location: map['location'] as GeoPoint?,
       address: map['address'],
       sensoryRatings: Map<String, double>.from(map['sensoryRatings'] ?? {}),
@@ -70,6 +75,7 @@ class PostModel {
       'authorName': authorName,
       'authorImage': authorImage,
       'imageUrl': imageUrl,
+      'imagePath':imagePath,
       'location': location,
       'address': address,
       'sensoryRatings': sensoryRatings,

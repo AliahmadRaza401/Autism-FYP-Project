@@ -8,12 +8,7 @@ import 'package:bluecircle/data/repositories/auth_repository.dart';
 import 'package:bluecircle/data/repositories/user_repository.dart';
 import 'package:bluecircle/shared/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart' show ExtensionSnackbar, GetNavigation;
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:get/get_utils/src/get_utils/get_utils.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfileController extends GetxController {
@@ -24,7 +19,8 @@ class EditProfileController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   final Rx<File?> profileImage = Rx<File?>(null);
   final RxBool isLoading = false.obs;
@@ -37,15 +33,17 @@ class EditProfileController extends GetxController {
     _loadUserData();
   }
 
-  void _loadUserData() async {
+  Future<void> _loadUserData() async {
     final userId = _authRepository.currentUser?.uid;
     if (userId == null) return;
 
     try {
       _user = await _userRepository.getUser(userId);
+
       nameController.text = _user.name;
       emailController.text = _user.email ?? '';
-      dev.log('Loaded user data for editing', name: 'EDIT_PROFILE_DEBUG');
+
+      dev.log('Loaded user data', name: 'EDIT_PROFILE_DEBUG');
     } catch (e) {
       ErrorHandler.showErrorSnackBar(e);
     }
@@ -53,8 +51,12 @@ class EditProfileController extends GetxController {
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) profileImage.value = File(pickedFile.path);
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      profileImage.value = File(pickedFile.path);
+    }
   }
 
   Future<void> saveProfile() async {
@@ -63,47 +65,64 @@ class EditProfileController extends GetxController {
     final password = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
 
+    // ✅ Validation
     if (name.isEmpty || email.isEmpty) {
-      return 
-      AppToast.error('Name and Email are required');
-      // Get.snackbar('Error', 'Name and Email are required');
+      return AppToast.error('Name and Email are required');
+    }
 
-    }
     if (!GetUtils.isEmail(email)) {
-      return AppToast.error( 'Invalid Email');
+      return AppToast.error('Invalid Email');
     }
+
     if (password.isNotEmpty && password.length < 6) {
-      return AppToast.error( 'Password must be at least 6 characters');
+      return AppToast.error(
+          'Password must be at least 6 characters');
     }
+
     if (password != confirmPassword) {
-      return AppToast.error( 'Passwords do not match');
+      return AppToast.error('Passwords do not match');
     }
 
     try {
       isLoading.value = true;
-      String? imageUrl;
 
+      String? imageUrl = _user.profileImage;
+      String? imagePath = _user.profileImageUrl;
+
+      // ✅ Upload new image if selected
       if (profileImage.value != null) {
-        imageUrl = await _storageService.uploadFile(
-          path: 'profile_images/${_user.id}.jpg',
+        final result = await _storageService.uploadImage(
           file: profileImage.value!,
+          folder: "users/${_user.id}",
         );
+
+        imageUrl = result["url"];
+        imagePath = result["path"];
       }
 
       final updatedUser = _user.copyWith(
         name: name,
         email: email,
-        profileImage: imageUrl ?? _user.profileImage,
-        password: password.isNotEmpty ? password : null,
+        profileImage: imageUrl,
+        profileImageUrl: imagePath,
+        password:
+            password.isNotEmpty ? password : null,
       );
 
       await _userRepository.updateUser(updatedUser);
 
-      dev.log('Profile updated successfully', name: 'EDIT_PROFILE_DEBUG');
-      ErrorHandler.showSuccessSnackBar('Success', 'Profile Updated Successfully');
+      dev.log('Profile updated successfully',
+          name: 'EDIT_PROFILE_DEBUG');
+
+      ErrorHandler.showSuccessSnackBar(
+          'Success', 'Profile Updated Successfully');
+
       Get.back();
     } catch (e) {
-      dev.log('Profile update failed: $e', name: 'EDIT_PROFILE_DEBUG', error: e);
+      dev.log('Profile update failed: $e',
+          name: 'EDIT_PROFILE_DEBUG',
+          error: e);
+
       ErrorHandler.showErrorSnackBar(e);
     } finally {
       isLoading.value = false;

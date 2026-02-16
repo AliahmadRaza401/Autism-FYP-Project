@@ -6,8 +6,8 @@ import 'core/constants/app_constants.dart';
 import 'routes/app_pages.dart';
 import 'core/bindings/initial_binding.dart';
 
-class bluecircleApp extends StatelessWidget {
-  const bluecircleApp({super.key});
+class BlueCircleApp extends StatelessWidget {
+  const BlueCircleApp({super.key});
 
   @override
   Widget build(BuildContext context) {

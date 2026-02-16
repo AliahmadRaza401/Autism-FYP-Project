@@ -38,9 +38,9 @@ class AppColors {
 }
 
 class AppStrings {
-  static const String appName = "bluecircle";
+  static const String appName = "Blue Circle";
   static const String getStartedTitle = "Easy to Use";
   static const String getStartedSubtitle = "Simple language layout and voice aids designed for everyone to your family.";
-  static const String signInTitle = "Sign In To bluecircle";
-  static const String signUpTitle = "Sign Up To bluecircle";
+  static const String signInTitle = "Sign In To Blue Circle";
+  static const String signUpTitle = "Sign Up To Blue Circle";
 }

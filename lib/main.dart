@@ -16,5 +16,5 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(const bluecircleApp());
+  runApp(const BlueCircleApp());
 }
