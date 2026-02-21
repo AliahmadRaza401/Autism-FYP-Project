@@ -1,3 +1,4 @@
+import 'package:bluecircle/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,7 +21,7 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
             icon: const Icon(Icons.add, color: Colors.white),
             onPressed: () {
               controller.clearForm();
-              Get.toNamed('/add-child');
+              Get.toNamed(Routes.ADD_CHILD);
             },
           ),
         ],
@@ -46,7 +47,7 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           controller.clearForm();
-          Get.toNamed('/add-child');
+          Get.toNamed(Routes.ADD_CHILD);
         },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -90,7 +91,7 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
             ElevatedButton.icon(
               onPressed: () {
                 controller.clearForm();
-                Get.toNamed('/add-child');
+                Get.toNamed(Routes.ADD_CHILD);
               },
               icon: const Icon(Icons.add),
               label: const Text("Add Your First Child"),
@@ -194,7 +195,7 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
                     switch (value) {
                       case 'edit':
                         controller.setChildForEdit(child);
-                        Get.toNamed('/edit-child', arguments: child);
+                        Get.toNamed(Routes.EDIT_CHILD, arguments: child);
                         break;
                       case 'delete':
                         _showDeleteDialog(child);
@@ -246,7 +247,7 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
           TextButton(
             onPressed: () {
               controller.deleteChild(child);
-              Get.back();
+              // Get.back();
             },
             child: const CText(text: "Delete", color: Colors.red, fontSize: 16,),
           ),

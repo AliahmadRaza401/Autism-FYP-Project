@@ -6,6 +6,7 @@ import 'package:bluecircle/data/models/child_model.dart';
 import 'package:bluecircle/data/repositories/child_repository.dart';
 import 'package:bluecircle/routes/app_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../shared/utils/image_picker_helper.dart';
@@ -81,29 +82,32 @@ class ChildrenManagementController extends GetxController {
     };
   }
 
-  void loadChildren() {
-    try {
-      final parentId = _authService.currentUser?.uid;
+ void loadChildren() {
+  final parentId = _authService.currentUser?.uid;
 
-      if (parentId != null) {
-        dev.log("Binding children stream for parent: $parentId", name: "CHILDREN_MGMT");
-        isLoading.value = true;
-        children.bindStream(_childRepository.getChildren(parentId));
-        
-        _childRepository.getChildren(parentId).first.then((_) {
-          isLoading.value = false;
-        }).catchError((e) {
-          isLoading.value = false;
-        });
-      } else {
-        dev.log("Parent ID is null, waiting for auth...", name: "CHILDREN_MGMT");
-      }
-    } catch (e) {
-      dev.log("Error binding children stream: $e", name: "CHILDREN_MGMT", error: e);
-      ErrorHandler.showErrorSnackBar("Failed to load children");
-      isLoading.value = false;
-    }
+  if (parentId == null) {
+    dev.log("Parent ID is null", name: "CHILDREN_MGMT");
+    return;
   }
+
+  dev.log("Binding children stream for parent: $parentId", name: "CHILDREN_MGMT");
+
+  isLoading.value = true;
+
+  final stream = _childRepository.getChildren(parentId);
+
+  children.bindStream(stream);
+
+  stream.listen(
+    (_) {
+      isLoading.value = false;
+    },
+    onError: (e) {
+      isLoading.value = false;
+      ErrorHandler.showErrorSnackBar("Failed to load children");
+    },
+  );
+}
 
   /// Show image picker sheet
   Future<void> pickImage() async {
@@ -147,6 +151,10 @@ class ChildrenManagementController extends GetxController {
     if (password.isEmpty) return ErrorHandler.showErrorSnackBar("Please enter a password");
     if (password.length < 6) return ErrorHandler.showErrorSnackBar("Password must be at least 6 characters");
 
+    // We'll use a secondary Firebase app to create the child user
+    // This prevents the parent from being signed out
+    FirebaseApp? secondaryApp;
+
     try {
       isLoading.value = true;
       final parentId = _authService.currentUser?.uid;
@@ -155,13 +163,27 @@ class ChildrenManagementController extends GetxController {
       final emailExists = await _childRepository.childEmailExists(email);
       if (emailExists) return ErrorHandler.showErrorSnackBar("This email is already in use");
 
-      final userCredential = await _authService.signUp(email, password);
+      dev.log("Creating secondary Firebase app for child auth", name: "CHILDREN_MGMT");
+      secondaryApp = await Firebase.initializeApp(
+        name: 'SecondaryApp_${DateTime.now().millisecondsSinceEpoch}',
+        options: Firebase.app().options,
+      );
+
+      final FirebaseAuth secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+      
+      dev.log("Signing up child in secondary app: $email", name: "CHILDREN_MGMT");
+      final userCredential = await secondaryAuth.createUserWithEmailAndPassword(
+        email: email, 
+        password: password
+      );
+      
       final childAuthId = userCredential.user!.uid;
 
       String? imageUrl;
       String? imagePath;
 
       if (selectedImage.value != null) {
+        isLoading.value = false; // Hide main loading
         isUploading.value = true;
         try {
           final result = await _storageService.uploadImage(
@@ -172,6 +194,7 @@ class ChildrenManagementController extends GetxController {
           imagePath = result['path'];
         } finally {
           isUploading.value = false;
+          isLoading.value = true; // Show main loading again
         }
       }
 
@@ -189,11 +212,11 @@ class ChildrenManagementController extends GetxController {
         profileImagePath: imagePath,
       );
 
-      await _childRepository.createChild(child);
+      await _childRepository.createChild(parentId, child);
 
       ErrorHandler.showSuccessSnackBar("Success", "Child account created successfully!");
-      Get.back();
       clearForm();
+      Get.offNamed(Routes.CHILDREN_MANAGEMENT);
       
     } on FirebaseAuthException catch (e) {
       String message;
@@ -217,6 +240,9 @@ class ChildrenManagementController extends GetxController {
     } finally {
       isLoading.value = false;
       isUploading.value = false;
+      if (secondaryApp != null) {
+        await secondaryApp.delete();
+      }
     }
   }
 

@@ -38,24 +38,33 @@ class RoleAuthService extends GetxService {
       isLoading.value = true;
       dev.log("Determining role for user: $uid", name: "ROLE_AUTH");
       
-      
+      // 1. Try to find in users collection (Parents)
       try {
         final user = await _userRepository.getUser(uid);
-        currentUser.value = user;
-        
-        if (user!.role == 'child') {
-          currentRole.value = UserRole.child;
-          dev.log("User is a CHILD", name: "ROLE_AUTH");
-        } else {
+        if (user != null) {
+          currentUser.value = user;
           currentRole.value = UserRole.parent;
           dev.log("User is a PARENT", name: "ROLE_AUTH");
+          return;
         }
-        return;
       } catch (e) {
-        dev.log("User not found in users collection", name: "ROLE_AUTH");
+        dev.log("Search in users collection failed", name: "ROLE_AUTH");
+      }
+
+      // 2. Try to find in children collection (Children)
+      try {
+        final child = await _childRepository.getChild(uid);
+        if (child != null) {
+          // Create a synthetic UserModel or just set the role
+          currentRole.value = UserRole.child;
+          dev.log("User is a CHILD", name: "ROLE_AUTH");
+          return;
+        }
+      } catch (e) {
+        dev.log("User not found in children collection either", name: "ROLE_AUTH");
       }
       
-    
+      // Fallback
       currentRole.value = UserRole.parent;
       
     } catch (e) {
