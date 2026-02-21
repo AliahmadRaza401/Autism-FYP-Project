@@ -26,13 +26,13 @@ class ChildSafetyController extends GetxController {
 
     try {
       final user = await _userRepository.getUser(userId);
-      if (user.childSafetySettings != null) {
+      if (user!.childSafetySettings != null) {
         isLocationTrackingEnabled.value = user.childSafetySettings!['locationTracking'] ?? true;
         isSafeZoneAlertsEnabled.value = user.childSafetySettings!['safeZoneAlerts'] ?? true;
         isEmergencyContactEnabled.value = user.childSafetySettings!['emergencyContact'] ?? false;
       }
     } catch (e) {
-      // Quietly handle or log
+    
     }
   }
 
@@ -42,7 +42,7 @@ class ChildSafetyController extends GetxController {
 
     try {
       final user = await _userRepository.getUser(userId);
-      final updatedUser = user.copyWith(
+      final updatedUser = user!.copyWith(
         childSafetySettings: {
           'locationTracking': isLocationTrackingEnabled.value,
           'safeZoneAlerts': isSafeZoneAlertsEnabled.value,

@@ -1,4 +1,5 @@
 import 'package:bluecircle/routes/app_pages.dart';
+import 'package:bluecircle/shared/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -12,34 +13,9 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: Column(
-        children: [
-          _buildHeader(),
-          Expanded(child: _buildBody()),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildHeader() {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Row(
-          children: [
-            // const Icon(Icons.arrow_back, color: Colors.white),
-            SizedBox(width: 12.w),
-            CText(
-              text: "Profile",
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ],
-        ),
-      ),
+      backgroundColor: Colors.white,
+      appBar: const CustomAppBar(text: "Profile", leadingIcon: false),
+      body: _buildBody(),
     );
   }
 
@@ -82,55 +58,61 @@ class ProfileView extends GetView<ProfileController> {
 
   
   Widget _buildProfileCard() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: _cardDecoration(),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 28.r,
-                backgroundColor: AppColors.primary.withValues(alpha: .1),
-                child: Icon(Icons.person, color: AppColors.primary, size: 28.sp),
-              ),
-              SizedBox(width: 12.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CText(
-                    text: "Ahmed",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  CText(
-                    text: "Guardian Account",
-                    fontSize: 12,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-
-   
-          GestureDetector(
-            onTap: controller.onEditProfileTap,
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12.h),
-              width: double.infinity,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.grey300),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child:  CText(text: "Edit Profile", fontSize: 16.sp,),
+    return Obx(() {
+      final userData = controller.user.value;
+      return Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: _cardDecoration(),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 28.r,
+                  backgroundColor: AppColors.primary.withValues(alpha: .1),
+                  backgroundImage: userData?.profileImageUrl != null
+                      ? NetworkImage(userData!.profileImageUrl!)
+                      : null,
+                  child: userData?.profileImageUrl == null
+                      ? Icon(Icons.person, color: AppColors.primary, size: 28.sp)
+                      : null,
+                ),
+                SizedBox(width: 12.w),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CText(
+                      text: userData?.name ?? "User",
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    CText(
+                      text: (userData?.role ?? "Parent").capitalizeFirst ?? "Guardian Account",
+                      fontSize: 12,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+            SizedBox(height: 16.h),
+            GestureDetector(
+              onTap: controller.onEditProfileTap,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                width: double.infinity,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.grey300),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: CText(text: "Edit Profile", fontSize: 16.sp),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   
@@ -151,43 +133,78 @@ class ProfileView extends GetView<ProfileController> {
   }
 
   Widget _childProfileCard() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: _cardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-           CText(text: "Child Profile", fontWeight: FontWeight.bold, fontSize: 16.sp,),
-          SizedBox(height: 10.h),
-          CText(
-            text: "Fatima - Age",
-            color: AppColors.primary,
-            fontWeight: FontWeight.w600, fontSize: 16.sp,
-          ),
-          const CText(
-            text: "Sensory preferences configure",
-            fontSize: 12,
-          ),
-          SizedBox(height: 14.h),
-
-          GestureDetector(
-            onTap: () {
-              Get.toNamed(Routes.PROFILE_SETUP);
-            },
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 12.h),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.grey100,
-                borderRadius: BorderRadius.circular(12.r),
+    return Obx(() {
+      final child = controller.firstChild.value;
+      if (child == null) {
+        return Container(
+          padding: EdgeInsets.all(20.w),
+          decoration: _cardDecoration(),
+          child: Column(
+            children: [
+              const CText(text: "No Child Added", fontWeight: FontWeight.bold, fontSize: 14),
+              SizedBox(height: 12.h),
+              GestureDetector(
+                onTap: () => Get.toNamed(Routes.CHILDREN_MANAGEMENT),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: CText(text: "Add Child Profile", fontSize: 14.sp, color: AppColors.primary),
+                ),
               ),
-              child:  CText(text: "Manage Child Profile", fontSize: 16.sp,),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      }
+      
+      return Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: _cardDecoration(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CText(text: "Child Profile", fontWeight: FontWeight.bold, fontSize: 16.sp),
+            SizedBox(height: 10.h),
+            GestureDetector(
+              onTap: () => Get.toNamed(Routes.CHILD_DASHBOARD, arguments: child),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CText(
+                    text: "${child.childName} - ${child.age} Years",
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.sp,
+                  ),
+                  const CText(
+                    text: "Sensory preferences configured",
+                    fontSize: 12,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 14.h),
+            GestureDetector(
+              onTap: () => Get.toNamed(Routes.CHILDREN_MANAGEMENT),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.grey100,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: CText(text: "Manage Children", fontSize: 16.sp),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _signOutCard() {

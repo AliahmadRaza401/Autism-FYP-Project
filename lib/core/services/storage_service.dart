@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
@@ -9,7 +11,7 @@ class StorageService extends GetxService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final _uuid = const Uuid();
 
-  /// Upload file and return both url + path
+  
   Future<Map<String, String>> uploadImage({
     required File file,
     required String folder,
@@ -133,7 +135,7 @@ class StorageService extends GetxService {
     }
   }
 
-  /// Check file existence
+  /// Check file existence //////////
   Future<bool> fileExists(String path) async {
     try {
       await _storage.ref().child(path).getMetadata();

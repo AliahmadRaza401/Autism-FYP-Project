@@ -10,60 +10,41 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool leadingIcon;
   final Color? bgColor;
   final Color? tColor;
+  final List<Widget>? actions;
 
   const CustomAppBar({
     super.key,
     required this.text,
     this.leadingIcon = true,
     this.bgColor,
-    this.tColor
+    this.tColor,
+    this.actions,
   });
 
   @override
   Widget build(BuildContext context) {
-    return PreferredSize(
-      preferredSize: Size.fromHeight(120.h),
-      child: AppBar(
-        backgroundColor:bgColor?? Colors.transparent,
-        // shadowColor: Colors.transparent,
-        leadingWidth: 40.w,
-        leading: leadingIcon
-            ? GestureDetector(
-                onTap: () {
-                  Get.back();
-                },
-                child: SizedBox(
-                  width: 40.w,
-                  height: 40.h,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color:tColor?? AppColors.kprimaryColor,
-                        size: 24.w,
-                      ),
-                    ),
-                  ),
-                ),
-              )
-            : const SizedBox(),
-        title: CText(
-          text: text,
-          fontSize: 19,
-          color:tColor?? Colors.black,
-          fontWeight: FontWeight.w600,
-          fontFamily: "Poppins",
-        ),
-        centerTitle: true,
-        elevation: 0,
-        actions: const [],
+    return AppBar(
+      backgroundColor: bgColor ?? AppColors.primary,
+      elevation: 0,
+      leading: leadingIcon
+          ? IconButton(
+              icon: Icon(Icons.arrow_back, color: tColor ?? Colors.white),
+              onPressed: () => Get.back(),
+            )
+          : null,
+      title: CText(
+        text: text,
+        fontSize: 20,
+        color: tColor ?? Colors.white,
+        fontWeight: FontWeight.bold,
       ),
+      centerTitle: true,
+      actions: actions,
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(70.h);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class CustomAppBar2 extends StatelessWidget implements PreferredSizeWidget {

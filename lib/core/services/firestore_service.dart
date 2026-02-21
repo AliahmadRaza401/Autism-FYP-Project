@@ -58,8 +58,11 @@ class FirestoreService extends GetxService {
   }) {
     final reference = _db.doc(path);
     final snapshots = reference.snapshots();
-    return snapshots.map((snapshot) =>
-        builder(snapshot.data() as Map<String, dynamic>, snapshot.id));
+    return snapshots.map((snapshot) {
+      final data = snapshot.data();
+      if (data == null) return null as T;
+      return builder(data, snapshot.id);
+    });
   }
 
   Future<T> getDocument<T>({
@@ -68,6 +71,10 @@ class FirestoreService extends GetxService {
   }) async {
     final reference = _db.doc(path);
     final snapshot = await reference.get();
-    return builder(snapshot.data() as Map<String, dynamic>, snapshot.id);
+    final data = snapshot.data();
+    if (data == null) {
+      return null as T; 
+    }
+    return builder(data, snapshot.id);
   }
 }

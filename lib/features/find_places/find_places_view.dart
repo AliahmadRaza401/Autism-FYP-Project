@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../shared/widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
 import '../../shared/widgets/custom_textfield.dart';
@@ -14,43 +15,31 @@ class FindPlacesView extends GetView<FindPlacesController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        title: CText(
-          text: "Find Places",
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
+      appBar: CustomAppBar(
+        text: "Find Places",
+        leadingIcon: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.map_outlined, color: Colors.white),
             onPressed: () {},
           )
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(100.h),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 16.h),
-            child: Column(
-              children: [
-                CustomTextField(
-                  hintText: "Search parks, clinics, malls...",
-                  preffixIcon: Icon(Icons.search, color: AppColors.grey500),
-                  controller: controller.searchController,
-                  textcolor: AppColors.textPrimary,
-                  hasPreffix: true,
-                  backcolor: Colors.white.withValues(alpha: 0.15),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 12.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: CustomTextField(
+              hintText: "Search parks, clinics, malls...",
+              preffixIcon: Icon(Icons.search, color: AppColors.grey500),
+              controller: controller.searchController,
+              textcolor: AppColors.textPrimary,
+              hasPreffix: true,
+              backcolor: AppColors.grey100,
+            ),
+          ),
           SizedBox(height: 12.h),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -61,7 +50,7 @@ class FindPlacesView extends GetView<FindPlacesController> {
             child: Obx(() => Row(
                   children: [
                     CText(
-                      text: "${controller.places.length} places nearby",
+                      text: "${controller.filteredPlaces.length} places nearby",
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.kpurple,
@@ -77,19 +66,19 @@ class FindPlacesView extends GetView<FindPlacesController> {
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (controller.places.isEmpty) {
+              if (controller.filteredPlaces.isEmpty) {
                 return Center(
                   child: CText(
-                    text: "No places found in this category.",
+                    text: "No places found.",
                     color: AppColors.textSecondary, fontSize: 14.sp,
                   ),
                 );
               }
               return ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
-                itemCount: controller.places.length,
+                itemCount: controller.filteredPlaces.length,
                 itemBuilder: (context, index) {
-                  final place = controller.places[index];
+                  final place = controller.filteredPlaces[index];
                   return PlaceCard(
                     title: place.name,
                     address: place.address ?? place.description,
@@ -120,14 +109,6 @@ class FindPlacesView extends GetView<FindPlacesController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.filter_list, color: AppColors.grey500, size: 20),
-          SizedBox(width: 8.w),
-          CText(
-            text: "Filter by Category",
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
-    
           SizedBox(width: 8.w),
           Expanded(
             child: SingleChildScrollView(

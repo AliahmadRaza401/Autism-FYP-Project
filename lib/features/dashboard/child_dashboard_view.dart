@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../shared/widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
 import '../find_places/find_places_view.dart';
-import '../profile/profile_view.dart';
 import '../safe_zone/safe_zone_view.dart';
 import 'child_dashboard_controller.dart';
 
@@ -16,7 +16,7 @@ class ChildDashboardView extends GetView<ChildDashboardController> {
       body: Obx(() => IndexedStack(
         index: controller.tabIndex.value,
         children: const [
-          FindPlacesView(),  // Map as first screen
+          FindPlacesView(),  
           SafeZoneView(),
           ChildProfileView(),
         ],
@@ -66,19 +66,13 @@ class ChildDashboardView extends GetView<ChildDashboardController> {
   }
 }
 
-/// Child Profile View - simplified profile for child
 class ChildProfileView extends GetView<ChildDashboardController> {
   const ChildProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Profile"),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: const CustomAppBar(text: "My Profile", leadingIcon: false),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -90,7 +84,6 @@ class ChildProfileView extends GetView<ChildDashboardController> {
           padding: EdgeInsets.all(16.w),
           child: Column(
             children: [
-              // Profile Header
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
@@ -106,7 +99,6 @@ class ChildProfileView extends GetView<ChildDashboardController> {
                 ),
                 child: Column(
                   children: [
-                    // Profile Image
                     CircleAvatar(
                       radius: 50.r,
                       backgroundColor: AppColors.primary.withOpacity(0.1),
@@ -119,7 +111,6 @@ class ChildProfileView extends GetView<ChildDashboardController> {
                     ),
                     SizedBox(height: 16.h),
                     
-                    // Child Name
                     Text(
                       child?.childName ?? "Child",
                       style: TextStyle(
@@ -130,7 +121,7 @@ class ChildProfileView extends GetView<ChildDashboardController> {
                     ),
                     SizedBox(height: 8.h),
                     
-                    // Age
+              
                     Text(
                       "Age: ${child?.age ?? 0}",
                       style: TextStyle(
@@ -144,13 +135,11 @@ class ChildProfileView extends GetView<ChildDashboardController> {
               
               SizedBox(height: 20.h),
               
-              // Quick Actions
               _buildQuickAction(
                 icon: Icons.favorite,
                 title: "My Favorites",
                 subtitle: "View saved places",
                 onTap: () {
-                  // Navigate to favorites
                 },
               ),
               
@@ -172,19 +161,17 @@ class ChildProfileView extends GetView<ChildDashboardController> {
                 title: "Settings",
                 subtitle: "App preferences",
                 onTap: () {
-                  // Navigate to settings
                 },
               ),
               
               SizedBox(height: 20.h),
               
-              // Logout Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () async {
-                    final roleAuthService = Get.find<dynamic>();
-                    // Sign out
+                    Get.find<dynamic>();
+                    
                     Get.offAllNamed('/sign-in');
                   },
                   icon: const Icon(Icons.logout),

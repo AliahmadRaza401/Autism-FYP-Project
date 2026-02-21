@@ -1,130 +1,113 @@
+import 'package:bluecircle/shared/widgets/c_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../shared/widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
-import '../../data/models/child_model.dart';
-import '../../shared/widgets/custom_textfield.dart';
 import '../../shared/widgets/custom_buttons.dart';
+import '../../shared/widgets/custom_textfield.dart';
 import 'children_management_controller.dart';
 
-class AddEditChildView extends GetView<ChildrenManagementController> {
-  const AddEditChildView({super.key});
+class AddEditChildView extends StatelessWidget {
+   AddEditChildView({super.key});
+  final ChildrenManagementController controller = Get.find<ChildrenManagementController>();
 
-  bool get isEditMode => Get.arguments != null && Get.arguments is ChildModel;
-  ChildModel? get editChild => isEditMode ? Get.arguments as ChildModel : null;
+
+  // bool get isEditMode => Get.arguments != null && Get.arguments is ChildModel;
+  // ChildModel? get editChild => isEditMode ? Get.arguments as ChildModel : null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditMode ? "Edit Child" : "Add Child"),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        text: controller.isEditMode ? "Edit Child" : "Add Child",
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Profile Image Section
             _buildImageSection(),
             SizedBox(height: 24.h),
 
-            // Basic Info
-            Text(
-              "Basic Information",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+            // Basic Info Section
+            _buildSectionCard(
+              title: "Basic Information",
+              children: [
+                _buildFieldLabel("Child's Full Name"),
+                CustomTextField(
+                  controller: controller.nameController,
+                  hintText: "Enter child's full name",
+                  hasPreffix: true,
+                  preffixIcon: Icon(Icons.person, color: AppColors.grey500, size: 20.w),
+                ),
+                SizedBox(height: 16.h),
+                _buildFieldLabel("Age"),
+                CustomTextField(
+                  controller: controller.ageController,
+                  hintText: "Enter child's age",
+                  keyboardType: TextInputType.number,
+                  hasPreffix: true,
+                  preffixIcon: Icon(Icons.cake, color: AppColors.grey500, size: 20.w),
+                ),
+                if (!controller.isEditMode) ...[
+                  SizedBox(height: 16.h),
+                  _buildFieldLabel("Child Login Email"),
+                  CustomTextField(
+                    controller: controller.emailController,
+                    hintText: "Enter email for child login",
+                    keyboardType: TextInputType.emailAddress,
+                    hasPreffix: true,
+                    preffixIcon: Icon(Icons.email, color: AppColors.grey500, size: 20.w),
+                  ),
+                  SizedBox(height: 16.h),
+                  _buildFieldLabel("Password"),
+                  CustomTextField(
+                    controller: controller.passwordController,
+                    hintText: "Enter password for child login",
+                    isPassword: true,
+                    hasPreffix: true,
+                    preffixIcon: Icon(Icons.lock, color: AppColors.grey500, size: 20.w),
+                  ),
+                ],
+                SizedBox(height: 16.h),
+                _buildFieldLabel("Additional Notes"),
+                CustomTextField(
+                  controller: controller.notesController,
+                  hintText: "Any additional notes",
+                  hasPreffix: true,
+                  preffixIcon: Icon(Icons.note, color: AppColors.grey500, size: 20.w),
+                  maxLines: 3,
+                ),
+              ],
             ),
+
             SizedBox(height: 16.h),
 
-            // Name Field
-            CustomTextField(
-              controller: controller.nameController,
-              hintText: "Enter child's full name",
-              hasPreffix: true,
-              preffixIcon: Icon(Icons.person, color: AppColors.grey500, size: 20.w),
+            // Sensory Preferences Section
+            _buildSectionCard(
+              title: "Sensory Preferences",
+              children: [
+                _buildSensorySlider("Noise Sensitivity", "noise"),
+                SizedBox(height: 16.h),
+                _buildSensorySlider("Crowd Sensitivity", "crowd"),
+                SizedBox(height: 16.h),
+                _buildSensorySlider("Light Sensitivity", "light"),
+                SizedBox(height: 16.h),
+                _buildSensorySlider("Touch Sensitivity", "touch"),
+              ],
             ),
-            SizedBox(height: 16.h),
-
-            // Age Field
-            CustomTextField(
-              controller: controller.ageController,
-              hintText: "Enter child's age",
-              keyboardType: TextInputType.number,
-              hasPreffix: true,
-              preffixIcon: Icon(Icons.cake, color: AppColors.grey500, size: 20.w),
-            ),
-            SizedBox(height: 16.h),
-
-            // Email Field (only for new child)
-            if (!isEditMode) ...[
-              CustomTextField(
-                controller: controller.emailController,
-                hintText: "Enter email for child login",
-                keyboardType: TextInputType.emailAddress,
-                hasPreffix: true,
-                preffixIcon: Icon(Icons.email, color: AppColors.grey500, size: 20.w),
-              ),
-              SizedBox(height: 16.h),
-
-              // Password Field (only for new child)
-              CustomTextField(
-                controller: controller.passwordController,
-                hintText: "Enter password for child login",
-                isPassword: true,
-                hasPreffix: true,
-                preffixIcon: Icon(Icons.lock, color: AppColors.grey500, size: 20.w),
-              ),
-              SizedBox(height: 16.h),
-            ],
-
-            // Notes Field
-            CustomTextField(
-              controller: controller.notesController,
-              hintText: "Any additional notes about the child",
-              hasPreffix: true,
-              preffixIcon: Icon(Icons.note, color: AppColors.grey500, size: 20.w),
-              maxLines: 3,
-            ),
-            SizedBox(height: 24.h),
-
-            // Sensory Preferences
-            Text(
-              "Sensory Preferences",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              "Rate the child's sensitivity levels (1-10)",
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            SizedBox(height: 16.h),
-
-            _buildSensorySlider("Noise Sensitivity", "noise"),
-            _buildSensorySlider("Crowd Sensitivity", "crowd"),
-            _buildSensorySlider("Light Sensitivity", "light"),
-            _buildSensorySlider("Touch Sensitivity", "touch"),
 
             SizedBox(height: 32.h),
 
             // Submit Button
             Obx(() => PrimaryButton(
-              text: isEditMode ? "Update Child" : "Create Child Account",
+              width: double.infinity,
+              text: controller.isEditMode ? "Update Child" : "Create Child Account",
               onTap: () {
-                if (isEditMode) {
-                  controller.updateChild(editChild!);
+                if (controller.isEditMode) {
+                  controller.updateChild(controller.editingChild.value!);
                 } else {
                   controller.createChild();
                 }
@@ -138,22 +121,25 @@ class AddEditChildView extends GetView<ChildrenManagementController> {
     );
   }
 
-  Widget _buildImageSection() {
-    return Center(
-      child: Column(
-        children: [
-          Obx(() => Stack(
+Widget _buildImageSection() {
+  return Center(
+    child: Column(
+      children: [
+        Obx(() {
+          final child = controller.editingChild.value;
+          final hasImage = controller.selectedImage.value != null || (child?.profileImageUrl != null);
+
+          return Stack(
             children: [
               CircleAvatar(
                 radius: 60.r,
                 backgroundColor: AppColors.primary.withOpacity(0.1),
                 backgroundImage: controller.selectedImage.value != null
                     ? FileImage(controller.selectedImage.value!)
-                    : (isEditMode && editChild?.profileImageUrl != null
-                        ? NetworkImage(editChild!.profileImageUrl!)
-                        : null),
-                child: (controller.selectedImage.value == null && 
-                       (isEditMode == false || editChild?.profileImageUrl == null))
+                    : (child?.profileImageUrl != null
+                        ? NetworkImage(child!.profileImageUrl!)
+                        : null) as ImageProvider<Object>?,
+                child: !hasImage
                     ? Icon(Icons.person, size: 60.r, color: AppColors.primary)
                     : null,
               ),
@@ -161,7 +147,7 @@ class AddEditChildView extends GetView<ChildrenManagementController> {
                 bottom: 0,
                 right: 0,
                 child: GestureDetector(
-                  onTap: () => _showImagePicker(),
+                  onTap: controller.pickImage,
                   child: Container(
                     padding: EdgeInsets.all(8.w),
                     decoration: BoxDecoration(
@@ -178,129 +164,110 @@ class AddEditChildView extends GetView<ChildrenManagementController> {
                 ),
               ),
             ],
-          )),
-          SizedBox(height: 8.h),
-          Text(
-            "Profile Photo",
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: AppColors.textSecondary,
-            ),
+          );
+        }),
+        SizedBox(height: 8.h),
+        Text(
+          "Profile Photo",
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: AppColors.textSecondary,
           ),
-        ],
-      ),
-    );
-  }
-
-  void _showImagePicker() {
-    Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
+      ],
+    ),
+  );
+}
+
+  Widget _buildSectionCard({
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Card(
+      color: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+      child: Padding(
+        padding: EdgeInsets.all(20.w),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text("Choose from Gallery"),
-              onTap: () {
-                Get.back();
-                controller.pickImage();
-              },
+            CText(
+              text: title,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
             ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Take a Photo"),
-              onTap: () {
-                Get.back();
-                controller.pickImageFromCamera();
-              },
-            ),
-            if (controller.selectedImage.value != null || 
-                (isEditMode && editChild?.profileImageUrl != null))
-              ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text("Remove Photo", style: TextStyle(color: Colors.red)),
-                onTap: () {
-                  Get.back();
-                  controller.clearImage();
-                },
-              ),
+            SizedBox(height: 12.h),
+            ...children,
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSensorySlider(String label, String key) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+  Widget _buildFieldLabel(String label) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: CText(
+        text: label,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Obx(() => Text(
-                "${controller.sensoryPreferences[key] ?? 5}",
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              )),
-            ],
+    );
+  }
+
+  Widget _buildSensorySlider(String label, String key) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            CText(
+              text: label,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+            Obx(() {
+              final val = (controller.sensoryPreferences[key] ?? 5).toDouble();
+              return CText(
+                text: val < 4
+                    ? "Low"
+                    : val < 7
+                    ? "Medium"
+                    : "High",
+                fontSize: 14,
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              );
+            }),
+          ],
+        ),
+        Obx(() => SliderTheme(
+          data: SliderTheme.of(Get.context!).copyWith(
+            activeTrackColor: AppColors.primary,
+            inactiveTrackColor: AppColors.grey200,
+            thumbColor: Colors.white,
+            trackHeight: 6.h,
+            thumbShape: RoundSliderThumbShape(
+              enabledThumbRadius: 10.r,
+              elevation: 2,
+            ),
+            overlayColor: AppColors.primary.withOpacity(0.1),
           ),
-          SizedBox(height: 8.h),
-          Obx(() => Slider(
+          child: Slider(
             value: (controller.sensoryPreferences[key] ?? 5).toDouble(),
             min: 1,
             max: 10,
             divisions: 9,
-            activeColor: AppColors.primary,
-            inactiveColor: AppColors.grey300,
-            onChanged: (value) {
-              controller.updateSensoryPreference(key, value.round());
+            onChanged: (val) {
+              controller.updateSensoryPreference(key, val.round());
             },
-          )),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Low",
-                style: TextStyle(fontSize: 12.sp, color: AppColors.grey500),
-              ),
-              Text(
-                "High",
-                style: TextStyle(fontSize: 12.sp, color: AppColors.grey500),
-              ),
-            ],
           ),
-        ],
-      ),
+        )),
+      ],
     );
   }
 }

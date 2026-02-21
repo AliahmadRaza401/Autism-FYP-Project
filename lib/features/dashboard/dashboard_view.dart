@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_constants.dart';
-import '../../routes/app_pages.dart';
 import '../home/home_view.dart';
 import '../find_places/find_places_view.dart';
 import '../community/community_view.dart';
@@ -24,17 +23,20 @@ class DashboardView extends GetView<DashboardController> {
           ProfileView(),
         ],
       )),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Get.toNamed(Routes.CHILDREN_MANAGEMENT);
-        },
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.child_care, color: Colors.white),
-        label: const Text(
-          "My Children",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
+      floatingActionButton: Obx(() {
+        if (!controller.showFab) return const SizedBox.shrink();
+
+        return FloatingActionButton.extended(
+          onPressed: controller.onFabPressed,
+          backgroundColor: AppColors.primary,
+          heroTag: "dashboardFAB",
+          icon: Icon(controller.fabIcon, color: Colors.white),
+          label: Text(
+            controller.fabLabel,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        );
+      }),
       bottomNavigationBar: Obx(() => Theme(
         data: ThemeData(
           splashColor: Colors.transparent,

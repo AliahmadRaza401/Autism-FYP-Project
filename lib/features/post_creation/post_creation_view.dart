@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../shared/widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
 import 'post_creation_controller.dart';
@@ -12,20 +13,7 @@ class PostCreationView extends GetView<PostCreationController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        title: const CText(
-          text: "Create Post",
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
-      ),
+      appBar: const CustomAppBar(text: "Create Post"),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
         child: Column(

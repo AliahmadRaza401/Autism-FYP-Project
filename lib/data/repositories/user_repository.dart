@@ -13,11 +13,15 @@ class UserRepository {
     );
   }
 
-  Future<UserModel> getUser(String userId) async {
-    return await _firestoreService.getDocument(
-      path: 'users/$userId',
-      builder: (data, id) => UserModel.fromMap(data, id),
-    );
+  Future<UserModel?> getUser(String userId) async {
+    try {
+      return await _firestoreService.getDocument(
+        path: 'users/$userId',
+        builder: (data, id) => UserModel.fromMap(data, id),
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> updateUser(UserModel user) async {

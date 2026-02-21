@@ -20,7 +20,7 @@ class SignInView extends GetView<AuthController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20.h),
+              SizedBox(height: 60.h),
               Container(
                 width: 80.w,
                 height: 80.w,
@@ -104,7 +104,7 @@ class SignInView extends GetView<AuthController> {
               //   ],
               // ),
            
-              SizedBox(height: 40.h),
+              SizedBox(height: 50.h),
  Obx(
   () => PrimaryIconButton(
     text: controller.isLoading.value ? "Signing in..." : "Sign In",
@@ -122,7 +122,7 @@ class SignInView extends GetView<AuthController> {
               //   color: AppColors.primary,
               //   fontWeight: FontWeight.w600,
               // ),
-              SizedBox(height: 30.h),
+              SizedBox(height: 20.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

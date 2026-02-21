@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../shared/widgets/custom_app_bar.dart';
+import '../../shared/widgets/c_text.dart';
 import '../../core/constants/app_constants.dart';
 import '../../data/models/child_model.dart';
 import 'children_management_controller.dart';
@@ -11,14 +13,11 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Children"),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
+      appBar: CustomAppBar(
+        text: "My Children",
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.white),
             onPressed: () {
               controller.clearForm();
               Get.toNamed('/add-child');
@@ -112,37 +111,41 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(20.r),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16.r),
-          onTap: () {
-            // Navigate to child details or edit
-          },
+          borderRadius: BorderRadius.circular(20.r),
+          onTap: () => controller.navigateToChildDashboard(child),
           child: Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(20.w),
             child: Row(
               children: [
-                // Profile Image
-                CircleAvatar(
-                  radius: 30.r,
-                  backgroundColor: AppColors.primary.withOpacity(0.1),
-                  backgroundImage: child.profileImageUrl != null
-                      ? NetworkImage(child.profileImageUrl!)
-                      : null,
-                  child: child.profileImageUrl == null
-                      ? Icon(Icons.person, size: 30.r, color: AppColors.primary)
-                      : null,
+                Container(
+                  padding: EdgeInsets.all(3.r),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 2),
+                  ),
+                  child: CircleAvatar(
+                    radius: 32.r,
+                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                    backgroundImage: child.profileImageUrl != null
+                        ? NetworkImage(child.profileImageUrl!)
+                        : null,
+                    child: child.profileImageUrl == null
+                        ? Icon(Icons.person, size: 32.r, color: AppColors.primary)
+                        : null,
+                  ),
                 ),
                 SizedBox(width: 16.w),
                 
@@ -151,70 +154,71 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        child.childName,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                      CText(
+                        text: child.childName,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                       SizedBox(height: 4.h),
-                      Text(
-                        "Age: ${child.age}",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: AppColors.textSecondary,
-                        ),
+                      Row(
+                        children: [
+                          Icon(Icons.cake_outlined, size: 14.sp, color: AppColors.primary),
+                          SizedBox(width: 4.w),
+                          CText(
+                            text: "${child.age} Years Old",
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ],
                       ),
                       if (child.notes != null && child.notes!.isNotEmpty) ...[
-                        SizedBox(height: 4.h),
-                        Text(
-                          child.notes!,
+                        SizedBox(height: 8.h),
+                        CText(
+                          text: child.notes!,
+                          fontSize: 12,
+                          color: AppColors.grey500,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: AppColors.grey500,
-                          ),
                         ),
                       ],
                     ],
                   ),
                 ),
                 
-                // Actions
+              
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, color: AppColors.textSecondary),
+                  icon: Icon(Icons.more_horiz, color: AppColors.textSecondary),
+                  padding: EdgeInsets.zero,
                   onSelected: (value) {
                     switch (value) {
                       case 'edit':
-                        controller.loadChildForEdit(child);
+                        controller.setChildForEdit(child);
                         Get.toNamed('/edit-child', arguments: child);
                         break;
                       case 'delete':
-                        controller.deleteChild(child);
+                        _showDeleteDialog(child);
                         break;
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'edit',
                       child: Row(
                         children: [
-                          Icon(Icons.edit, size: 20),
-                          SizedBox(width: 8),
-                          Text("Edit"),
+                          Icon(Icons.edit_outlined, size: 20.sp, color: AppColors.primary),
+                          SizedBox(width: 12.w),
+                          const CText(text: "Edit Profile", fontSize: 14),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete, size: 20, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text("Delete", style: TextStyle(color: Colors.red)),
+                          Icon(Icons.delete_outline, size: 20.sp, color: Colors.red),
+                          SizedBox(width: 12.w),
+                          const CText(text: "Remove", fontSize: 14, color: Colors.red),
                         ],
                       ),
                     ),
@@ -224,6 +228,29 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDeleteDialog(ChildModel child) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: const CText(text: "Delete Profile", fontWeight: FontWeight.bold, fontSize: 16,),
+        content: CText(text: "Are you sure you want to remove ${child.childName}?", fontSize: 16,),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const CText(text: "Cancel", fontSize: 16,),
+          ),
+          TextButton(
+            onPressed: () {
+              controller.deleteChild(child);
+              Get.back();
+            },
+            child: const CText(text: "Delete", color: Colors.red, fontSize: 16,),
+          ),
+        ],
       ),
     );
   }

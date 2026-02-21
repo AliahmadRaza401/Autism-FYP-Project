@@ -11,7 +11,8 @@ class FindPlacesController extends GetxController {
   final List<String> categories = ["All", "Parks", "Museums", "Cafes", "Schools"];
   final RxString selectedCategory = "All".obs;
   
-  final RxList<PlaceModel> places = <PlaceModel>[].obs;
+  final RxList<PlaceModel> allPlaces = <PlaceModel>[].obs;
+  final RxList<PlaceModel> filteredPlaces = <PlaceModel>[].obs;
   final RxBool isLoading = false.obs;
 
   @override
@@ -26,11 +27,10 @@ class FindPlacesController extends GetxController {
       _fetchPlaces();
     });
 
+    ever(allPlaces, (_) => _filterPlaces());
+
     searchController.addListener(() {
-      debounce(RxString(searchController.text), (value) {
-        dev.log('Searching for: $value', name: 'FIND_PLACES_DEBUG');
-        _fetchPlaces();
-      }, time: const Duration(milliseconds: 500));
+      _filterPlaces();
     });
   }
 
@@ -43,9 +43,22 @@ class FindPlacesController extends GetxController {
 
   void _fetchPlaces() {
     dev.log('Fetching places for category: ${selectedCategory.value}', name: 'FIND_PLACES_DEBUG');
-    places.bindStream(_placesRepository.getPlaces(
+    allPlaces.bindStream(_placesRepository.getPlaces(
       category: selectedCategory.value,
     ));
+  }
+
+  void _filterPlaces() {
+    final query = searchController.text.toLowerCase();
+    if (query.isEmpty) {
+      filteredPlaces.value = allPlaces;
+    } else {
+      filteredPlaces.value = allPlaces.where((place) {
+        return place.name.toLowerCase().contains(query) ||
+               place.description.toLowerCase().contains(query) ||
+               (place.address?.toLowerCase().contains(query) ?? false);
+      }).toList();
+    }
   }
 
   void selectCategory(String category) {

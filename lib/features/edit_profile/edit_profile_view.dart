@@ -1,3 +1,4 @@
+import 'package:bluecircle/shared/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,15 +14,11 @@ class EditProfileView extends GetView<EditProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: Colors.white,
+      appBar: const CustomAppBar(text: "Edit Profile"),
       body: Stack(
         children: [
-          Column(
-            children: [
-              _buildHeader(),
-              Expanded(child: _buildBody()),
-            ],
-          ),
+          _buildBody(),
           Obx(() => controller.isLoading.value
               ? Container(
                   color: Colors.black26,
@@ -29,29 +26,6 @@ class EditProfileView extends GetView<EditProfileController> {
                 )
               : const SizedBox.shrink()),
         ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => Get.back(),
-              child: const Icon(Icons.arrow_back, color: Colors.white),
-            ),
-            SizedBox(width: 12.w),
-            const CText(
-              text: "Edit Profile",
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -70,13 +44,34 @@ class EditProfileView extends GetView<EditProfileController> {
               onTap: controller.pickImage,
               child: Obx(() {
                 final img = controller.profileImage.value;
-                return CircleAvatar(
-                  radius: 50.r,
-                  backgroundColor: AppColors.grey200,
-                  backgroundImage: img != null ? FileImage(img) as ImageProvider : null,
-                  child: img == null
-                      ? Icon(Icons.person, size: 50.r, color: AppColors.grey400)
-                      : null,
+                final user = controller.user.value;
+                
+                return Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 50.r,
+                      backgroundColor: AppColors.grey200,
+                      backgroundImage: img != null 
+                        ? FileImage(img) as ImageProvider 
+                        : (user?.profileImage != null ? NetworkImage(user!.profileImage!) : null),
+                      child: (img == null && user?.profileImage == null)
+                          ? Icon(Icons.person, size: 50.r, color: AppColors.grey400)
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: EdgeInsets.all(4.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: Icon(Icons.camera_alt, color: Colors.white, size: 16.w),
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),
@@ -94,7 +89,23 @@ class EditProfileView extends GetView<EditProfileController> {
             controller: controller.emailController,
             hintText: "Enter email",
             hasPreffix: true,
+            
             preffixIcon: Icon(Icons.email_outlined, color: AppColors.grey500),
+          ),
+          _buildLabel("Phone Number"),
+          CustomSecondTextField(
+            controller: controller.phoneController,
+            hintText: "Enter phone number",
+            hasPreffix: true,
+            keyboardType: TextInputType.phone,
+            preffixIcon: Icon(Icons.phone_outlined, color: AppColors.grey500),
+          ),
+          _buildLabel("Emergency Contact"),
+          CustomSecondTextField(
+            controller: controller.emergencyController,
+            hintText: "Emergency contact name/phone",
+            hasPreffix: true,
+            preffixIcon: Icon(Icons.contact_phone_outlined, color: AppColors.grey500),
           ),
           _buildLabel("Password"),
           CustomSecondTextField(

@@ -1,36 +1,33 @@
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'package:bluecircle/core/services/auth_service.dart';
+import 'package:bluecircle/core/services/storage_service.dart';
+import 'package:bluecircle/data/models/child_model.dart';
+import 'package:bluecircle/data/repositories/child_repository.dart';
+import 'package:bluecircle/routes/app_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import '../../data/models/child_model.dart';
-import '../../data/repositories/child_repository.dart';
-import '../../core/services/auth_service.dart';
-import '../../core/services/storage_service.dart';
+import '../../shared/utils/image_picker_helper.dart';
 import '../../core/utils/error_handler.dart';
 
 class ChildrenManagementController extends GetxController {
   final ChildRepository _childRepository = Get.find<ChildRepository>();
   final AuthService _authService = Get.find<AuthService>();
   final StorageService _storageService = Get.find<StorageService>();
-  
+
   final RxList<ChildModel> children = <ChildModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isUploading = false.obs;
-  
-  // Form controllers
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
-  
-  // Image
+
   final Rx<File?> selectedImage = Rx<File?>(null);
-  final ImagePicker _picker = ImagePicker();
-  
-  // Sensory preferences
+
   final RxMap<String, int> sensoryPreferences = <String, int>{}.obs;
 
   @override
@@ -38,15 +35,6 @@ class ChildrenManagementController extends GetxController {
     super.onInit();
     loadChildren();
     _initSensoryPreferences();
-  }
-
-  void _initSensoryPreferences() {
-    sensoryPreferences.value = {
-      'noise': 5,
-      'crowd': 5,
-      'light': 5,
-      'touch': 5,
-    };
   }
 
   @override
@@ -59,70 +47,81 @@ class ChildrenManagementController extends GetxController {
     super.onClose();
   }
 
-  /// Load all children for the current parent
-  Future<void> loadChildren() async {
+
+    final Rx<ChildModel?> editingChild = Rx<ChildModel?>(null);
+
+  bool get isEditMode => editingChild.value != null;
+
+  void setChildForEdit(ChildModel child) {
+    editingChild.value = child;
+    nameController.text = child.childName;
+    ageController.text = child.age.toString();
+    notesController.text = child.notes ?? '';
+    emailController.text = child.childEmail ?? '';
+    passwordController.clear();
+    sensoryPreferences.value = Map<String, int>.from(child.sensoryPreferences);
+    selectedImage.value = null;
+  }
+
+  void clearEditMode() {
+    editingChild.value = null;
+    clearForm();
+  }
+
+  void navigateToChildDashboard(ChildModel child) {
+    Get.toNamed(Routes.CHILD_DASHBOARD, arguments: child);
+  }
+
+  void _initSensoryPreferences() {
+    sensoryPreferences.value = {
+      'noise': 5,
+      'crowd': 5,
+      'light': 5,
+      'touch': 5,
+    };
+  }
+
+  void loadChildren() {
     try {
-      isLoading.value = true;
       final parentId = _authService.currentUser?.uid;
-      
+
       if (parentId != null) {
-        dev.log("Loading children for parent: $parentId", name: "CHILDREN_MGMT");
+        dev.log("Binding children stream for parent: $parentId", name: "CHILDREN_MGMT");
+        isLoading.value = true;
+        children.bindStream(_childRepository.getChildren(parentId));
         
-        _childRepository.getChildren(parentId).listen((childList) {
-          children.value = childList;
-          dev.log("Loaded ${childList.length} children", name: "CHILDREN_MGMT");
+        _childRepository.getChildren(parentId).first.then((_) {
+          isLoading.value = false;
+        }).catchError((e) {
+          isLoading.value = false;
         });
+      } else {
+        dev.log("Parent ID is null, waiting for auth...", name: "CHILDREN_MGMT");
       }
     } catch (e) {
-      dev.log("Error loading children: $e", name: "CHILDREN_MGMT", error: e);
+      dev.log("Error binding children stream: $e", name: "CHILDREN_MGMT", error: e);
       ErrorHandler.showErrorSnackBar("Failed to load children");
-    } finally {
       isLoading.value = false;
     }
   }
 
-  /// Pick image from gallery
+  /// Show image picker sheet
   Future<void> pickImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        selectedImage.value = File(image.path);
-      }
-    } catch (e) {
-      dev.log("Error picking image: $e", name: "CHILDREN_MGMT", error: e);
-    }
+    await ImagePickerHelper.showImageSourceSheet(
+      onImagePicked: (file) {
+        selectedImage.value = file;
+      },
+      onImageRemoved: () {
+        selectedImage.value = null;
+      },
+      showRemoveOption: selectedImage.value != null || editingChild.value?.profileImageUrl != null,
+    );
   }
 
-  /// Pick image from camera
-  Future<void> pickImageFromCamera() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        selectedImage.value = File(image.path);
-      }
-    } catch (e) {
-      dev.log("Error picking image from camera: $e", name: "CHILDREN_MGMT", error: e);
-    }
-  }
-
-  /// Clear selected image
   void clearImage() {
     selectedImage.value = null;
   }
 
-  /// Clear form fields
   void clearForm() {
     nameController.clear();
     ageController.clear();
@@ -133,133 +132,85 @@ class ChildrenManagementController extends GetxController {
     _initSensoryPreferences();
   }
 
-  /// Create a new child account
   Future<void> createChild() async {
     final name = nameController.text.trim();
     final ageText = ageController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final notes = notesController.text.trim();
-    
-    // Validation
-    if (name.isEmpty) {
-      ErrorHandler.showErrorSnackBar("Please enter child's name");
-      return;
-    }
-    
-    if (ageText.isEmpty) {
-      ErrorHandler.showErrorSnackBar("Please enter child's age");
-      return;
-    }
-    
+
+    if (name.isEmpty) return ErrorHandler.showErrorSnackBar("Please enter child's name");
+    if (ageText.isEmpty) return ErrorHandler.showErrorSnackBar("Please enter child's age");
     final age = int.tryParse(ageText);
-    if (age == null || age < 0 || age > 18) {
-      ErrorHandler.showErrorSnackBar("Please enter a valid age (0-18)");
-      return;
-    }
-    
-    if (email.isEmpty) {
-      ErrorHandler.showErrorSnackBar("Please enter child's email");
-      return;
-    }
-    
-    if (password.isEmpty) {
-      ErrorHandler.showErrorSnackBar("Please enter a password");
-      return;
-    }
-    
-    if (password.length < 6) {
-      ErrorHandler.showErrorSnackBar("Password must be at least 6 characters");
-      return;
-    }
+    if (age == null || age < 0 || age > 18) return ErrorHandler.showErrorSnackBar("Please enter a valid age (0-18)");
+    if (email.isEmpty) return ErrorHandler.showErrorSnackBar("Please enter child's email");
+    if (password.isEmpty) return ErrorHandler.showErrorSnackBar("Please enter a password");
+    if (password.length < 6) return ErrorHandler.showErrorSnackBar("Password must be at least 6 characters");
 
     try {
       isLoading.value = true;
       final parentId = _authService.currentUser?.uid;
-      
-      if (parentId == null) {
-        ErrorHandler.showErrorSnackBar("Please login as a parent");
-        return;
-      }
+      if (parentId == null) return ErrorHandler.showErrorSnackBar("Please login as a parent");
 
-      // Check if email already exists
       final emailExists = await _childRepository.childEmailExists(email);
-      if (emailExists) {
-        ErrorHandler.showErrorSnackBar("This email is already in use");
-        return;
+      if (emailExists) return ErrorHandler.showErrorSnackBar("This email is already in use");
+
+      final userCredential = await _authService.signUp(email, password);
+      final childAuthId = userCredential.user!.uid;
+
+      String? imageUrl;
+      String? imagePath;
+
+      if (selectedImage.value != null) {
+        isUploading.value = true;
+        try {
+          final result = await _storageService.uploadImage(
+            file: selectedImage.value!,
+            folder: 'child_profiles/$childAuthId',
+          );
+          imageUrl = result['url'];
+          imagePath = result['path'];
+        } finally {
+          isUploading.value = false;
+        }
       }
 
-      // Create Firebase Auth account for child
-      dev.log("Creating Firebase Auth account for child: $email", name: "CHILDREN_MGMT");
+      final child = ChildModel(
+        childId: childAuthId,
+        parentId: parentId,
+        childName: name,
+        age: age,
+        sensoryPreferences: Map<String, int>.from(sensoryPreferences),
+        notes: notes.isEmpty ? null : notes,
+        createdAt: DateTime.now(),
+        childEmail: email,
+        childPassword: password,
+        profileImageUrl: imageUrl,
+        profileImagePath: imagePath,
+      );
+
+      await _childRepository.createChild(child);
+
+      ErrorHandler.showSuccessSnackBar("Success", "Child account created successfully!");
+      Get.back();
+      clearForm();
       
-      try {
-        final userCredential = await _authService.signUp(email, password);
-        final childAuthId = userCredential.user!.uid;
-        
-        dev.log("Child Firebase Auth account created: $childAuthId", name: "CHILDREN_MGMT");
-        
-        // Upload profile image if selected
-        String? imageUrl;
-        String? imagePath;
-        
-        if (selectedImage.value != null) {
-          isUploading.value = true;
-          try {
-            final result = await _storageService.uploadImage(
-              file: selectedImage.value!,
-              folder: 'child_profiles/$childAuthId',
-            );
-            imageUrl = result['url'];
-            imagePath = result['path'];
-          } catch (e) {
-            dev.log("Error uploading image: $e", name: "CHILDREN_MGMT", error: e);
-          } finally {
-            isUploading.value = false;
-          }
-        }
-
-        // Create child model
-        final child = ChildModel(
-          childId: childAuthId,
-          parentId: parentId,
-          childName: name,
-          age: age,
-          sensoryPreferences: Map<String, int>.from(sensoryPreferences),
-          notes: notes.isEmpty ? null : notes,
-          createdAt: DateTime.now(),
-          childEmail: email,
-          childPassword: password, // Note: In production, consider hashing or using Firebase Admin
-          profileImageUrl: imageUrl,
-          profileImagePath: imagePath,
-        );
-
-        // Save child profile in Firestore
-        await _childRepository.createChild(child);
-        
-        dev.log("Child profile created successfully", name: "CHILDREN_MGMT");
-        
-        ErrorHandler.showSuccessSnackBar("Success", "Child account created successfully!");
-        clearForm();
-        Get.back();
-        
-      } on FirebaseAuthException catch (e) {
-        String message;
-        switch (e.code) {
-          case 'email-already-in-use':
-            message = "This email is already registered";
-            break;
-          case 'invalid-email':
-            message = "Invalid email address";
-            break;
-          case 'weak-password':
-            message = "Password is too weak";
-            break;
-          default:
-            message = e.message ?? "Failed to create account";
-        }
-        ErrorHandler.showErrorSnackBar(message);
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'email-already-in-use':
+          message = "This email is already registered";
+          break;
+        case 'invalid-email':
+          message = "Invalid email address";
+          break;
+        case 'weak-password':
+          message = "Password is too weak";
+          break;
+        default:
+          message = e.message ?? "Failed to create account";
       }
-      
+      ErrorHandler.showErrorSnackBar(message);
     } catch (e) {
       dev.log("Error creating child: $e", name: "CHILDREN_MGMT", error: e);
       ErrorHandler.showErrorSnackBar("Failed to create child account");
@@ -269,35 +220,23 @@ class ChildrenManagementController extends GetxController {
     }
   }
 
-  /// Update an existing child
   Future<void> updateChild(ChildModel child) async {
     final name = nameController.text.trim();
     final ageText = ageController.text.trim();
     final notes = notesController.text.trim();
-    
-    // Validation
-    if (name.isEmpty) {
-      ErrorHandler.showErrorSnackBar("Please enter child's name");
-      return;
-    }
-    
+
+    if (name.isEmpty) return ErrorHandler.showErrorSnackBar("Please enter child's name");
     final age = int.tryParse(ageText);
-    if (age == null || age < 0 || age > 18) {
-      ErrorHandler.showErrorSnackBar("Please enter a valid age (0-18)");
-      return;
-    }
+    if (age == null || age < 0 || age > 18) return ErrorHandler.showErrorSnackBar("Please enter a valid age (0-18)");
 
     try {
       isLoading.value = true;
-      
+
       String? imageUrl = child.profileImageUrl;
       String? imagePath = child.profileImagePath;
-      
-      // Upload new profile image if selected
+
       if (selectedImage.value != null) {
         isUploading.value = true;
-        
-        // Delete old image if exists
         if (child.profileImagePath != null) {
           try {
             await _storageService.deleteFile(child.profileImagePath!);
@@ -305,7 +244,7 @@ class ChildrenManagementController extends GetxController {
             dev.log("Error deleting old image: $e", name: "CHILDREN_MGMT");
           }
         }
-        
+
         try {
           final result = await _storageService.uploadImage(
             file: selectedImage.value!,
@@ -313,22 +252,16 @@ class ChildrenManagementController extends GetxController {
           );
           imageUrl = result['url'];
           imagePath = result['path'];
-        } catch (e) {
-          dev.log("Error uploading image: $e", name: "CHILDREN_MGMT", error: e);
         } finally {
           isUploading.value = false;
         }
       }
 
-      // Update password if changed
       final newPassword = passwordController.text.trim();
       if (newPassword.isNotEmpty && newPassword.length >= 6) {
-        // Note: Password update requires re-authentication in Firebase
-        // For simplicity, we'll update it in Firestore (in production, use Firebase Admin)
         await _childRepository.updateChildPassword(child.childId, newPassword);
       }
 
-      // Update child model
       final updatedChild = child.copyWith(
         childName: name,
         age: age,
@@ -338,15 +271,11 @@ class ChildrenManagementController extends GetxController {
         profileImagePath: imagePath,
       );
 
-      // Update in Firestore
       await _childRepository.updateChild(updatedChild);
-      
-      dev.log("Child updated successfully", name: "CHILDREN_MGMT");
-      
+
       ErrorHandler.showSuccessSnackBar("Success", "Child profile updated!");
       clearForm();
       Get.back();
-      
     } catch (e) {
       dev.log("Error updating child: $e", name: "CHILDREN_MGMT", error: e);
       ErrorHandler.showErrorSnackBar("Failed to update child profile");
@@ -356,16 +285,17 @@ class ChildrenManagementController extends GetxController {
     }
   }
 
-  /// Delete a child
+  
   Future<void> deleteChild(ChildModel child) async {
     try {
       isLoading.value = true;
-      
-      // Show confirmation dialog
+
       final confirmed = await Get.dialog<bool>(
         AlertDialog(
           title: const Text("Delete Child"),
-          content: Text("Are you sure you want to delete ${child.childName}'s account? This will also delete their Firebase account and cannot be undone."),
+          content: Text(
+            "Are you sure you want to delete ${child.childName}'s account? This will also delete their Firebase account and cannot be undone.",
+          ),
           actions: [
             TextButton(
               onPressed: () => Get.back(result: false),
@@ -382,7 +312,6 @@ class ChildrenManagementController extends GetxController {
 
       if (confirmed != true) return;
 
-      // Delete profile image from storage
       if (child.profileImagePath != null) {
         try {
           await _storageService.deleteFile(child.profileImagePath!);
@@ -391,17 +320,9 @@ class ChildrenManagementController extends GetxController {
         }
       }
 
-      // Delete child profile from Firestore
       await _childRepository.deleteChild(child.childId);
-      
-      dev.log("Child profile deleted from Firestore", name: "CHILDREN_MGMT");
-      
-      // Note: Deleting Firebase Auth account requires Firebase Admin SDK
-      // For now, we'll just delete the Firestore data
-      // In production, you'd use Cloud Functions to delete the Auth account
-      
+
       ErrorHandler.showSuccessSnackBar("Success", "Child profile deleted!");
-      
     } catch (e) {
       dev.log("Error deleting child: $e", name: "CHILDREN_MGMT", error: e);
       ErrorHandler.showErrorSnackBar("Failed to delete child profile");
@@ -410,26 +331,8 @@ class ChildrenManagementController extends GetxController {
     }
   }
 
-  /// Load child data into form for editing
-  void loadChildForEdit(ChildModel child) {
-    nameController.text = child.childName;
-    ageController.text = child.age.toString();
-    notesController.text = child.notes ?? '';
-    emailController.text = child.childEmail ?? '';
-    // Don't pre-fill password for security
-    passwordController.clear();
-    sensoryPreferences.value = Map<String, int>.from(child.sensoryPreferences);
-    
-    if (child.profileImageUrl != null) {
-      // We can't set File from URL, so just clear selectedImage
-      // The UI will show the existing image from URL
-      selectedImage.value = null;
-    }
-  }
 
-  /// Update sensory preference
   void updateSensoryPreference(String key, int value) {
     sensoryPreferences[key] = value;
   }
 }
-

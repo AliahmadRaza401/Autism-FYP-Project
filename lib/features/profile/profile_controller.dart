@@ -6,6 +6,8 @@ import 'package:bluecircle/core/utils/error_handler.dart';
 import 'package:bluecircle/data/models/user_model.dart';
 import 'package:bluecircle/data/repositories/auth_repository.dart';
 import 'package:bluecircle/data/repositories/user_repository.dart';
+import 'package:bluecircle/data/repositories/child_repository.dart';
+import 'package:bluecircle/data/models/child_model.dart';
 import 'package:bluecircle/routes/app_pages.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -18,6 +20,7 @@ class ProfileController extends GetxController {
   final UserRepository _userRepository = Get.find<UserRepository>();
 
   final Rxn<UserModel> user = Rxn<UserModel>();
+  final Rxn<ChildModel> firstChild = Rxn<ChildModel>();
   final RxBool isLoading = false.obs;
 
   @override
@@ -30,7 +33,11 @@ class ProfileController extends GetxController {
     final userId = _authRepository.currentUser?.uid;
     if (userId != null) {
       user.bindStream(_userRepository.userStream(userId));
-      dev.log('User stream bound for $userId', name: 'PROFILE_DEBUG');
+      
+      final childRepo = Get.find<ChildRepository>();
+      firstChild.bindStream(childRepo.getChildren(userId).map((list) => list.isNotEmpty ? list.first : null));
+      
+      dev.log('User and Child streams bound for $userId', name: 'PROFILE_DEBUG');
     }
   }
 

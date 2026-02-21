@@ -1,8 +1,8 @@
 import 'package:bluecircle/core/constants/app_images.dart';
-import 'package:bluecircle/shared/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../shared/widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
 import 'community_controller.dart';
@@ -12,82 +12,44 @@ class CommunityView extends GetView<CommunityController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: Column(
-        children: [
-        
-          _buildHeader(),
-
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(30.r),
-                ),
-              ),
-              child: ListView(
-                children: [
-                  _buildWelcomeCard(),
-                  SizedBox(height: 24.h),
-                  CText(
-                    text: "Community Groups",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildBrowseGroups(),
-                  SizedBox(height: 20.h),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getTimeAgo(DateTime dateTime) {
-    final difference = DateTime.now().difference(dateTime);
-    if (difference.inDays > 0) return "${difference.inDays}d ago";
-    if (difference.inHours > 0) return "${difference.inHours}h ago";
-    if (difference.inMinutes > 0) return "${difference.inMinutes}m ago";
-    return "Just now";
-  }
-
-
-  /// ================= HEADER =================
-
-  Widget _buildHeader() {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.all(20.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: const CustomAppBar(text: "Community", leadingIcon: false),
+        body: Column(
           children: [
-            Row(
-              children: [
-                CText(
-                  text: "Community",
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
                   color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(30.r),
+                  ),
                 ),
-              ],
-            ),
-            SizedBox(height: 20.h),
-
-            ///  ==============SEARCH BAR ======
-            CustomTextField(
-              hintText: "Search groups ...",
-              preffixIcon: Icon(Icons.search, color: AppColors.grey500),
-              controller: TextEditingController(),
-              textcolor: AppColors.textPrimary,
-              hasPreffix: true,
-              backcolor: Colors.white.withValues(alpha: 0.15),
+                child: Column(
+                  children: [
+                    TabBar(
+                      labelColor: AppColors.primary,
+                      unselectedLabelColor: AppColors.grey500,
+                      indicatorColor: AppColors.primary,
+                      tabs: const [
+                        Tab(text: "Feed"),
+                        Tab(text: "Groups"),
+                      ],
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          _buildPostFeed(),
+                          _buildGroupsTab(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -95,7 +57,232 @@ class CommunityView extends GetView<CommunityController> {
     );
   }
 
-  /// ================= WELCOME CARD =================
+  Widget _buildGroupsTab() {
+    return ListView(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      children: [
+        SizedBox(height: 20.h),
+        _buildWelcomeCard(),
+        SizedBox(height: 24.h),
+        _buildBrowseGroups(),
+        SizedBox(height: 20.h),
+      ],
+    );
+  }
+
+  Widget _buildPostFeed() {
+    return Column(
+      children: [
+        SizedBox(height: 16.h),
+        _buildCategoryChips(),
+        Expanded(
+          child: Obx(() {
+            final posts = controller.filteredPosts.isEmpty
+                ? controller.allPosts
+                : controller.filteredPosts;
+
+            if (controller.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (posts.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.post_add_outlined,
+                      size: 64.sp,
+                      color: AppColors.grey400,
+                    ),
+                    SizedBox(height: 16.h),
+                    CText(
+                      text: "No posts yet. Be the first to post!",
+                      fontSize: 16,
+                      color: AppColors.textSecondary,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: controller.refreshPosts,
+              child: ListView.builder(
+                itemCount: posts.length,
+                padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 80.h),
+                itemBuilder: (context, index) {
+                  final post = posts[index];
+                  return _buildPostCard(post);
+                },
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryChips() {
+    return Obx(() {
+      if (controller.categories.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return SizedBox(
+        height: 40.h,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 8.w),
+              child: ChoiceChip(
+                label: const CText(text: "All Posts", fontSize: 12),
+                selected: controller.selectedCategory.value == null,
+                onSelected: (_) => controller.clearCategoryFilter(),
+                selectedColor: AppColors.primary,
+                backgroundColor: AppColors.grey100,
+                labelStyle: TextStyle(
+                  color: controller.selectedCategory.value == null
+                      ? Colors.white
+                      : AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ...controller.categories.map((category) {
+              final isSelected = controller.selectedCategory.value?.id == category.id;
+              return Padding(
+                padding: EdgeInsets.only(right: 8.w),
+                child: ChoiceChip(
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(category.icon, style: TextStyle(fontSize: 14.sp)),
+                      SizedBox(width: 4.w),
+                      CText(text: category.name, fontSize: 12),
+                    ],
+                  ),
+                  selected: isSelected,
+                  onSelected: (_) => controller.selectCategory(category),
+                  selectedColor: AppColors.primary,
+                  backgroundColor: AppColors.grey100,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildPostCard(post) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 20.r,
+                backgroundColor: AppColors.grey200,
+                backgroundImage: post.authorImage != null && post.authorImage!.isNotEmpty
+                    ? NetworkImage(post.authorImage!)
+                    : null,
+                child: post.authorImage == null || post.authorImage!.isEmpty
+                    ? Icon(Icons.person, color: AppColors.grey500)
+                    : null,
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CText(
+                      text: post.authorName ?? "Parent",
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    CText(
+                      text: post.createdAt.toString().substring(0, 16),
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          CText(
+            text: post.title,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+          SizedBox(height: 8.h),
+          CText(
+            text: post.description,
+            fontSize: 14,
+            color: AppColors.textPrimary,
+            lineHeight: 1.5,
+          ),
+          if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
+            SizedBox(height: 12.h),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Image.network(
+                post.imageUrl!,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+          SizedBox(height: 12.h),
+          Row(
+            children: [
+              InkWell(
+                onTap: () => controller.likePost(post.id),
+                child: Row(
+                  children: [
+                    Icon(Icons.favorite_border, size: 20.sp, color: AppColors.textSecondary),
+                    SizedBox(width: 6.w),
+                    CText(text: post.likesCount.toString(), fontSize: 14, color: AppColors.textSecondary),
+                  ],
+                ),
+              ),
+              SizedBox(width: 24.w),
+              Row(
+                children: [
+                  Icon(Icons.chat_bubble_outline, size: 20.sp, color: AppColors.textSecondary),
+                  SizedBox(width: 6.w),
+                  CText(text: post.commentCount.toString(), fontSize: 14, color: AppColors.textSecondary),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildWelcomeCard() {
     return Container(
@@ -123,8 +310,6 @@ class CommunityView extends GetView<CommunityController> {
       ),
     );
   }
-
-  /// ================= GROUPS =================
 
   Widget _buildBrowseGroups() {
     return Column(
@@ -186,7 +371,6 @@ class CommunityView extends GetView<CommunityController> {
       ),
       child: Row(
         children: [
-        
           Container(
               height: 46.h,
               width: 46.h,
@@ -195,10 +379,7 @@ class CommunityView extends GetView<CommunityController> {
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Image.asset(image)),
-
           SizedBox(width: 12.w),
-
-       
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,17 +400,6 @@ class CommunityView extends GetView<CommunityController> {
                     Icon(Icons.people_outline, size: 14.sp),
                     SizedBox(width: 4.w),
                     CText(text: members, fontSize: 11),
-                    SizedBox(width: 12.w),
-                    Container(
-                      height: 6,
-                      width: 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 4.w),
-                    const CText(text: "Active", fontSize: 11),
                   ],
                 )
               ],

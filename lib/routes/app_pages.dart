@@ -8,8 +8,6 @@ import '../features/onboarding/get_started_view.dart';
 import '../features/auth/sign_in_view.dart';
 import '../features/auth/sign_up_view.dart';
 import '../features/auth/auth_binding.dart';
-import '../features/profile_setup/profile_setup_view.dart';
-import '../features/profile_setup/profile_setup_binding.dart';
 import '../features/dashboard/dashboard_view.dart';
 import '../features/dashboard/dashboard_binding.dart';
 import '../features/dashboard/child_dashboard_view.dart';
@@ -33,6 +31,8 @@ import '../features/edit_profile/edit_profile_view.dart';
 import '../features/edit_profile/edit_profile_binding.dart';
 import '../features/post_creation/post_creation_view.dart';
 import '../features/post_creation/post_creation_binding.dart';
+import '../features/find_places/add_place_view.dart';
+import '../features/find_places/add_place_binding.dart';
 
 part 'app_routes.dart';
 
@@ -65,11 +65,6 @@ class AppPages {
       name: _Paths.SIGN_UP,
       page: () => const SignUpView(),
       binding: AuthBinding(),
-    ),
-    GetPage(
-      name: _Paths.PROFILE_SETUP,
-      page: () => const ProfileSetupView(),
-      binding: ProfileSetupBinding(),
     ),
     GetPage(
       name: _Paths.SAFE_ZONE,
@@ -123,18 +118,23 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.ADD_CHILD,
-      page: () => const AddEditChildView(),
+      page: () =>  AddEditChildView(),
       binding: ChildrenManagementBinding(),
     ),
     GetPage(
       name: _Paths.EDIT_CHILD,
-      page: () => const AddEditChildView(),
+      page: () =>  AddEditChildView(),
       binding: ChildrenManagementBinding(),
     ),
     GetPage(
       name: _Paths.POST_CREATION,
       page: () => const PostCreationView(),
       binding: PostCreationBinding(),
+    ),
+    GetPage(
+      name: _Paths.PLACE_CREATION,
+      page: () => const AddPlaceView(),
+      binding: AddPlaceBinding(),
     ),
   ];
 }

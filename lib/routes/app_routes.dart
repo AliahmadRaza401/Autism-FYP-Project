@@ -10,7 +10,6 @@ abstract class Routes {
   static const GET_STARTED = _Paths.GET_STARTED;
   static const SIGN_IN = _Paths.SIGN_IN;
   static const SIGN_UP = _Paths.SIGN_UP;
-  static const PROFILE_SETUP = _Paths.PROFILE_SETUP;
   static const SAFE_ZONE = _Paths.SAFE_ZONE;
   static const HOME = _Paths.HOME;
   static const FIND_PLACES = _Paths.FIND_PLACES;
@@ -24,6 +23,7 @@ abstract class Routes {
   static const ADD_CHILD = _Paths.ADD_CHILD;
   static const EDIT_CHILD = _Paths.EDIT_CHILD;
   static const POST_CREATION = _Paths.POST_CREATION;
+  static const PLACE_CREATION = _Paths.PLACE_CREATION;
 }
 
 abstract class _Paths {
@@ -33,7 +33,6 @@ abstract class _Paths {
   static const GET_STARTED = '/get-started';
   static const SIGN_IN = '/sign-in';
   static const SIGN_UP = '/sign-up';
-  static const PROFILE_SETUP = '/profile-setup';
   static const SAFE_ZONE = '/safe-zone';
   static const HOME = '/home';
   static const FIND_PLACES = '/find-places';
@@ -47,5 +46,6 @@ abstract class _Paths {
   static const ADD_CHILD = '/add-child';
   static const EDIT_CHILD = '/edit-child';
   static const POST_CREATION = '/post-creation';
+  static const PLACE_CREATION = '/place-creation';
 }
 

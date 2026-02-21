@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import '../../shared/utils/image_picker_helper.dart';
 import '../../data/repositories/community_repository.dart';
 import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/auth_repository.dart';
@@ -29,7 +29,6 @@ class PostCreationController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
 
-  final ImagePicker _picker = ImagePicker();
 
   @override
   void onInit() {
@@ -53,22 +52,15 @@ class PostCreationController extends GetxController {
 
   
   Future<void> pickImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-
-      if (image != null) {
-        selectedImage.value = File(image.path);
-        dev.log('Image selected: ${image.path}', name: 'POST_CREATION_DEBUG');
-      }
-    } catch (e) {
-      dev.log('Error picking image: $e', name: 'POST_CREATION_DEBUG');
-      ErrorHandler.showErrorSnackBar('Failed to pick image');
-    }
+    await ImagePickerHelper.showImageSourceSheet(
+      onImagePicked: (file) {
+        selectedImage.value = file;
+      },
+      onImageRemoved: () {
+        selectedImage.value = null;
+      },
+      showRemoveOption: selectedImage.value != null,
+    );
   }
 
   
@@ -134,7 +126,7 @@ class PostCreationController extends GetxController {
         title: title,
         description: description,
         categoryId: selectedCategory.value!.id,
-        authorName: user.name,
+        authorName: user!.name,
         authorImage: user.profileImage,
         imageUrl: imageUrl,
         imagePath: imagePath,

@@ -71,4 +71,8 @@ class PlacesRepository {
       'savedAt': FieldValue.serverTimestamp(),
     });
   }
+
+  Future<void> createPlace(PlaceModel place) async {
+    await _firestore.collection(_collection).doc(place.id).set(place.toMap());
+  }
 }
