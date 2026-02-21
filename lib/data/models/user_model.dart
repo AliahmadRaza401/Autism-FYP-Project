@@ -1,3 +1,31 @@
+/// Enum representing user roles in the application
+enum UserRole {
+  parent,
+  child,
+}
+
+/// Extension to convert UserRole to/from string
+extension UserRoleExtension on UserRole {
+  String get value {
+    switch (this) {
+      case UserRole.parent:
+        return 'parent';
+      case UserRole.child:
+        return 'child';
+    }
+  }
+
+  static UserRole fromString(String? role) {
+    switch (role) {
+      case 'child':
+        return UserRole.child;
+      case 'parent':
+      default:
+        return UserRole.parent;
+    }
+  }
+}
+
 class UserModel {
   final String id;
   final String name;
@@ -17,11 +45,13 @@ class UserModel {
   final List<String>? favorites;
   final Map<String, dynamic>? childSafetySettings;
   final String? profileImageUrl;
-  final String role; // 'parent' | 'community_member'
+  final String role; // 'parent' | 'child'
   final DateTime createdAt;
   final DateTime? deletedAt;
-   final String? password;
-
+  final String? password;
+  
+  // For child users - reference to parent
+  final String? parentId;
 
   UserModel({
     required this.id,
@@ -46,6 +76,7 @@ class UserModel {
     this.role = 'parent',
     required this.createdAt,
     this.deletedAt,
+    this.parentId,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map, String documentId) {
@@ -74,6 +105,7 @@ class UserModel {
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt']) 
           : DateTime.now(),
       deletedAt: map['deletedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['deletedAt']) : null,
+      parentId: map['parentId'],
     );
   }
 
@@ -99,6 +131,7 @@ class UserModel {
       'childSafetySettings': childSafetySettings,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'deletedAt': deletedAt?.millisecondsSinceEpoch,
+      'parentId': parentId,
     };
   }
 
@@ -125,6 +158,7 @@ class UserModel {
     DateTime? createdAt,
     DateTime? deletedAt,
     String? password,
+    String? parentId,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -149,6 +183,8 @@ class UserModel {
       createdAt: createdAt ?? this.createdAt,
       deletedAt: deletedAt ?? this.deletedAt,
       password: password ?? this.password,
+      parentId: parentId ?? this.parentId,
     );
   }
 }
+

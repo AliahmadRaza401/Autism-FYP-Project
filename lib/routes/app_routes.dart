@@ -1,3 +1,4 @@
+
 // ignore_for_file: constant_identifier_names
 
 part of 'app_pages.dart';
@@ -18,6 +19,10 @@ abstract class Routes {
   static const PROFILE = _Paths.PROFILE;
   static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
   static const DASHBOARD = _Paths.DASHBOARD;
+  static const CHILD_DASHBOARD = _Paths.CHILD_DASHBOARD;
+  static const CHILDREN_MANAGEMENT = _Paths.CHILDREN_MANAGEMENT;
+  static const ADD_CHILD = _Paths.ADD_CHILD;
+  static const EDIT_CHILD = _Paths.EDIT_CHILD;
   static const POST_CREATION = _Paths.POST_CREATION;
 }
 
@@ -37,5 +42,10 @@ abstract class _Paths {
   static const PROFILE = '/profile';
   static const EDIT_PROFILE = '/edit-profile';
   static const DASHBOARD = '/dashboard';
+  static const CHILD_DASHBOARD = '/child-dashboard';
+  static const CHILDREN_MANAGEMENT = '/children-management';
+  static const ADD_CHILD = '/add-child';
+  static const EDIT_CHILD = '/edit-child';
   static const POST_CREATION = '/post-creation';
 }
+

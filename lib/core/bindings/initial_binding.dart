@@ -5,6 +5,7 @@ import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../services/location_service.dart';
 import '../services/network_checker_service.dart';
+import '../services/role_auth_service.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/repositories/safe_zone_repository.dart';
@@ -24,6 +25,7 @@ class InitialBinding extends Bindings {
     Get.put(StorageService(), permanent: true);
     Get.put(LocationService(), permanent: true);
     Get.put(NetworkCheckerService(), permanent: true);
+    Get.put(RoleAuthService(), permanent: true);
 
     Get.putAsync(() => NotificationService().init(), permanent: true);
 

@@ -1,3 +1,4 @@
+
 import 'package:get/get.dart';
 import '../features/splash/splash_view.dart';
 import '../features/splash/splash_binding.dart';
@@ -11,6 +12,11 @@ import '../features/profile_setup/profile_setup_view.dart';
 import '../features/profile_setup/profile_setup_binding.dart';
 import '../features/dashboard/dashboard_view.dart';
 import '../features/dashboard/dashboard_binding.dart';
+import '../features/dashboard/child_dashboard_view.dart';
+import '../features/dashboard/child_dashboard_binding.dart';
+import '../features/dashboard/children_management_view.dart';
+import '../features/dashboard/children_management_binding.dart';
+import '../features/dashboard/add_edit_child_view.dart';
 import '../features/safe_zone/safe_zone_view.dart';
 import '../features/safe_zone/safe_zone_binding.dart';
 import '../features/home/home_view.dart';
@@ -106,9 +112,30 @@ class AppPages {
       binding: DashboardBinding(),
     ),
     GetPage(
+      name: _Paths.CHILD_DASHBOARD,
+      page: () => const ChildDashboardView(),
+      binding: ChildDashboardBinding(),
+    ),
+    GetPage(
+      name: _Paths.CHILDREN_MANAGEMENT,
+      page: () => const ChildrenManagementView(),
+      binding: ChildrenManagementBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADD_CHILD,
+      page: () => const AddEditChildView(),
+      binding: ChildrenManagementBinding(),
+    ),
+    GetPage(
+      name: _Paths.EDIT_CHILD,
+      page: () => const AddEditChildView(),
+      binding: ChildrenManagementBinding(),
+    ),
+    GetPage(
       name: _Paths.POST_CREATION,
       page: () => const PostCreationView(),
       binding: PostCreationBinding(),
     ),
   ];
 }
+

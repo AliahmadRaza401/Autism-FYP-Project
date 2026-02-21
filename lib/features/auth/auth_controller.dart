@@ -8,10 +8,12 @@ import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/models/user_model.dart';
 import '../../core/utils/error_handler.dart';
+import '../../core/services/role_auth_service.dart';
 
 class AuthController extends GetxController {
   final AuthRepository _authRepository = Get.find<AuthRepository>();
   final UserRepository _userRepository = Get.find<UserRepository>();
+  final RoleAuthService _roleAuthService = Get.find<RoleAuthService>();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -64,12 +66,25 @@ Future<void> signIn() async {
 
     await _authRepository.signIn(email, password);
 
-    ErrorHandler.showSuccessSnackBar(
-      "Welcome Back",
-      "Login successful",
-    );
+    // Get user role and navigate accordingly
+    final user = _authRepository.currentUser;
+    if (user != null) {
+      final userData = await _userRepository.getUser(user.uid);
+      final role = userData.role;
+      
+      dev.log("User role detected: $role", name: "AUTH_CONTROLLER");
+      
+      ErrorHandler.showSuccessSnackBar("Welcome Back", "Login successful");
 
-    Get.offAllNamed(Routes.DASHBOARD);
+      // Navigate based on role
+      if (role == 'child') {
+        Get.offAllNamed(Routes.CHILD_DASHBOARD);
+      } else {
+        Get.offAllNamed(Routes.DASHBOARD);
+      }
+    } else {
+      ErrorHandler.showErrorSnackBar("Failed to get user data");
+    }
   } on FirebaseAuthException catch (e) {
     String message;
     switch (e.code) {
@@ -117,10 +132,12 @@ Future<void> signUp() async {
     isLoading.value = true;
     final userCredential = await _authRepository.signUp(email, password);
 
+    // New users are always registered as 'parent' role
     final newUser = UserModel(
       id: userCredential.user!.uid,
       name: name,
       email: email,
+      role: 'parent', // Default role for new registrations
       createdAt: DateTime.now(),
     );
 

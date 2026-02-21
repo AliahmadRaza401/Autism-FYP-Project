@@ -1,3 +1,4 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -10,6 +11,21 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
 
+    // Helper function to check if user is a parent
+    function isParent() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent';
+    }
+
+    // Helper function to check if user is a child
+    function isChild() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'child';
+    }
+
+    // Helper function to get parent ID of a child
+    function getParentId(childId) {
+      return get(/databases/$(database)/documents/children/$(childId)).data.parentId;
+    }
+
     // Module 1: Users
     match /users/{userId} {
       allow read: if isAuthenticated();
@@ -17,8 +33,23 @@ service cloud.firestore {
     }
 
     // Module 2: Children Profiles
+    // Parents can only access their own children
+    // Children can only access their own profile
     match /children/{childId} {
-      allow read, write: if isAuthenticated() && (resource == null || resource.data.parentId == request.auth.uid) && (request.resource == null || request.resource.data.parentId == request.auth.uid);
+      // Read: Allow if parent owns the child OR child is accessing their own profile
+      allow read: if isAuthenticated() && (
+        (isParent() && resource.data.parentId == request.auth.uid) ||
+        (isChild() && resource.data.childId == request.auth.uid)
+      );
+      
+      // Create: Only parents can create children
+      allow create: if isAuthenticated() && isParent() && request.resource.data.parentId == request.auth.uid;
+      
+      // Update: Only parent who owns the child can update
+      allow update: if isAuthenticated() && isParent() && resource.data.parentId == request.auth.uid;
+      
+      // Delete: Only parent who owns the child can delete
+      allow delete: if isAuthenticated() && isParent() && resource.data.parentId == request.auth.uid;
     }
 
     // Module 3: Posts
@@ -70,3 +101,4 @@ service cloud.firestore {
     }
   }
 }
+
