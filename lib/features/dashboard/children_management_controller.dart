@@ -27,6 +27,8 @@ class ChildrenManagementController extends GetxController {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
 
+  final Rx<DateTime?> selectedDob = Rx<DateTime?>(null);
+
   final Rx<File?> selectedImage = Rx<File?>(null);
 
   final RxMap<String, int> sensoryPreferences = <String, int>{}.obs;
@@ -73,6 +75,30 @@ class ChildrenManagementController extends GetxController {
     Get.toNamed(Routes.CHILD_DASHBOARD, arguments: child);
   }
 
+  Future<void> pickDateOfBirth(BuildContext context) async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDob.value ?? DateTime(now.year - 5),
+      firstDate: DateTime(now.year - 18),
+      lastDate: now,
+    );
+    if (picked != null) {
+      selectedDob.value = picked;
+      final age = _calculateAge(picked);
+      ageController.text = age.toString();
+    }
+  }
+
+  int _calculateAge(DateTime dob) {
+    final now = DateTime.now();
+    int age = now.year - dob.year;
+    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+      age--;
+    }
+    return age;
+  }
+
   void _initSensoryPreferences() {
     sensoryPreferences.value = {
       'noise': 5,
@@ -81,6 +107,28 @@ class ChildrenManagementController extends GetxController {
       'touch': 5,
     };
   }
+
+  void submitChild() {
+  if (isEditMode) {
+    updateChild(editingChild.value!);
+    ErrorHandler.showSuccessSnackBar(
+  'Success',
+  'Update Child successfully!',
+);
+    if (Navigator.of(Get.context!).canPop()) {
+  Navigator.of(Get.context!).pop();
+}
+  } else {
+    createChild();
+    ErrorHandler.showSuccessSnackBar(
+  'Success',
+  'Child created successfully!',
+);
+    if (Navigator.of(Get.context!).canPop()) {
+  Navigator.of(Get.context!).pop();
+}
+  }
+}
 
  void loadChildren() {
   final parentId = _authService.currentUser?.uid;
@@ -137,6 +185,7 @@ class ChildrenManagementController extends GetxController {
   }
 
   Future<void> createChild() async {
+    if (isLoading.value) return; // Prevent multiple submissions
     final name = nameController.text.trim();
     final ageText = ageController.text.trim();
     final email = emailController.text.trim();
@@ -216,7 +265,7 @@ class ChildrenManagementController extends GetxController {
 
       ErrorHandler.showSuccessSnackBar("Success", "Child account created successfully!");
       clearForm();
-      Get.offNamed(Routes.CHILDREN_MANAGEMENT);
+      Get.back();
       
     } on FirebaseAuthException catch (e) {
       String message;
@@ -247,6 +296,7 @@ class ChildrenManagementController extends GetxController {
   }
 
   Future<void> updateChild(ChildModel child) async {
+    if (isLoading.value) return; // Prevent multiple submissions
     final name = nameController.text.trim();
     final ageText = ageController.text.trim();
     final notes = notesController.text.trim();

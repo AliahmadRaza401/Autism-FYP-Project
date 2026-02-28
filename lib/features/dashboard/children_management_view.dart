@@ -198,7 +198,7 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
                         Get.toNamed(Routes.EDIT_CHILD, arguments: child);
                         break;
                       case 'delete':
-                        _showDeleteDialog(child);
+                        controller.deleteChild(child);
                         break;
                     }
                   },
@@ -224,36 +224,6 @@ class ChildrenManagementView extends GetView<ChildrenManagementController> {
                       ),
                     ),
                   ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+                )])))));
 
-  void _showDeleteDialog(ChildModel child) {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        title: const CText(text: "Delete Profile", fontWeight: FontWeight.bold, fontSize: 16,),
-        content: CText(text: "Are you sure you want to remove ${child.childName}?", fontSize: 16,),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const CText(text: "Cancel", fontSize: 16,),
-          ),
-          TextButton(
-            onPressed: () {
-              controller.deleteChild(child);
-              // Get.back();
-            },
-            child: const CText(text: "Delete", color: Colors.red, fontSize: 16,),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
+  }}

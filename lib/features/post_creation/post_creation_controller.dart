@@ -11,6 +11,7 @@ import '../../data/models/post_model.dart';
 import '../../data/models/category_model.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/utils/error_handler.dart';
+import '../community/community_controller.dart';
 
 class PostCreationController extends GetxController {
   
@@ -70,6 +71,8 @@ class PostCreationController extends GetxController {
 
   
   Future<void> createPost() async {
+    if (isLoading.value) return;
+    
     if (selectedCategory.value == null) {
       ErrorHandler.showErrorSnackBar('Please select a category');
       return;
@@ -148,7 +151,17 @@ class PostCreationController extends GetxController {
       selectedCategory.value = null;
       selectedImage.value = null;
 
-      Get.back();
+      // Get.back();
+      dev.log('Can pop: ${Get.key.currentState?.canPop()}', name: 'NAV_DEBUG');
+
+      if (Navigator.of(Get.context!).canPop()) {
+  Navigator.of(Get.context!).pop();
+}
+      // Automatically refresh the community post list when a post is created
+      if (Get.isRegistered<CommunityController>()) {
+        final communityController = Get.find<CommunityController>();
+        communityController.refreshPosts();
+      }
     } catch (e) {
       dev.log('Error creating post: $e', name: 'POST_CREATION_DEBUG');
       ErrorHandler.showErrorSnackBar(e);

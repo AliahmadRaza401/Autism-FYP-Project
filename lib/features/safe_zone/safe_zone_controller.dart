@@ -35,7 +35,7 @@ class SafeZoneController extends GetxController {
   void _startLocationTracking() {
     _locationService.getPositionStream().listen(
       (Position position) {
-        // If we have an active safe zone view being configured
+        // If we have an active safe zone view being configured by calculateDistance ok MUhammad
         if (center.value.latitude != 0.0) {
           final dist = _locationService.calculateDistance(
             center.value.latitude, 

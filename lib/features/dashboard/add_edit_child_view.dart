@@ -43,13 +43,18 @@ class AddEditChildView extends StatelessWidget {
                   preffixIcon: Icon(Icons.person, color: AppColors.grey500, size: 20.w),
                 ),
                 SizedBox(height: 16.h),
-                _buildFieldLabel("Age"),
-                CustomTextField(
-                  controller: controller.ageController,
-                  hintText: "Enter child's age",
-                  keyboardType: TextInputType.number,
-                  hasPreffix: true,
-                  preffixIcon: Icon(Icons.cake, color: AppColors.grey500, size: 20.w),
+                _buildFieldLabel("Date of Birth"),
+                GestureDetector(
+                  onTap: () => controller.pickDateOfBirth(context),
+                  child: AbsorbPointer(
+                    child: CustomTextField(
+                      controller: controller.ageController,
+                      hintText: "Select Date of Birth (Calculates Age)",
+                      keyboardType: TextInputType.none,
+                      hasPreffix: true,
+                      preffixIcon: Icon(Icons.cake, color: AppColors.grey500, size: 20.w),
+                    ),
+                  ),
                 ),
                 if (!controller.isEditMode) ...[
                   SizedBox(height: 16.h),
@@ -101,19 +106,17 @@ class AddEditChildView extends StatelessWidget {
 
             SizedBox(height: 32.h),
 
-            // Submit Button
-            Obx(() => PrimaryButton(
-              width: double.infinity,
-              text: controller.isEditMode ? "Update Child" : "Create Child Account",
-              onTap: () {
-                if (controller.isEditMode) {
-                  controller.updateChild(controller.editingChild.value!);
-                } else {
-                  controller.createChild();
-                }
-              },
-            )),
+            // Submit Button 
+Obx(() => PrimaryButton(
+      text: controller.isEditMode
+          ? "Update Child"
+          : "Create Child Account",
+      width: double.infinity,
+      isLoading: controller.isLoading.value,
+      onTap: controller.submitChild,
+))
 
+            ,
             SizedBox(height: 32.h),
           ],
         ),

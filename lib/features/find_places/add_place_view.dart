@@ -1,3 +1,4 @@
+import 'package:bluecircle/shared/widgets/custom_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -46,28 +47,13 @@ class AddPlaceView extends GetView<AddPlaceController> {
             SizedBox(height: 24.h),
             _buildSettingsToggle(),
             SizedBox(height: 32.h),
-            Obx(() => SizedBox(
-              width: double.infinity,
-              height: 56.h,
-              child: ElevatedButton(
-                onPressed: controller.isLoading.value ? null : () => controller.createPlace(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                  elevation: 0,
-                ),
-                child: controller.isLoading.value
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const CText(
-                        text: "Create Place",
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-              ),
-            )),
+            Obx(() => PrimaryButton(
+      text: "Create Place",
+      width: double.infinity,
+      isLoading: controller.isLoading.value,
+      onTap: controller.createPlace,
+))
+           
           ],
         ),
       ),

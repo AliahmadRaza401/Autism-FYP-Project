@@ -1,256 +1,159 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../shared/widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
-import '../find_places/find_places_view.dart';
-import '../safe_zone/safe_zone_view.dart';
 import 'child_dashboard_controller.dart';
+import '../../routes/app_pages.dart';
+import '../../core/services/role_auth_service.dart';
 
 class ChildDashboardView extends GetView<ChildDashboardController> {
   const ChildDashboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final bool isParentFlow = Get.arguments != null;
+
     return Scaffold(
-      body: Obx(() => IndexedStack(
-        index: controller.tabIndex.value,
-        children: const [
-          FindPlacesView(),  
-          SafeZoneView(),
-          ChildProfileView(),
+      appBar: CustomAppBar(
+        text: "${controller.currentChild.value?.childName ?? 'Child'}'s Location", 
+        leadingIcon: isParentFlow, 
+        actions: [
+          if (!isParentFlow) 
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () async {
+                 await Get.find<RoleAuthService>().signOut();
+                 Get.offAllNamed(Routes.SIGN_IN);
+              },
+            )
         ],
-      )),
-      bottomNavigationBar: Obx(() => Theme(
-        data: ThemeData(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: BottomNavigationBar(
-          currentIndex: controller.tabIndex.value,
-          onTap: controller.changeTabIndex,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.grey500,
-          showUnselectedLabels: true,
-          backgroundColor: Colors.white,
-          elevation: 10,
-          selectedLabelStyle: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w500,
-          ),
-          items: [
-            _buildNavItem(Icons.map, "Map"),
-            _buildNavItem(Icons.shield, "Safe Zones"),
-            _buildNavItem(Icons.person, "Profile"),
-          ],
-        ),
-      )),
-    );
-  }
-
-  BottomNavigationBarItem _buildNavItem(IconData icon, String label) {
-    return BottomNavigationBarItem(
-      icon: Container(
-        margin: EdgeInsets.only(bottom: 4.h),
-        child: Icon(icon, size: 24.sp),
       ),
-      label: label,
-    );
-  }
-}
-
-class ChildProfileView extends GetView<ChildDashboardController> {
-  const ChildProfileView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(text: "My Profile", leadingIcon: false),
       body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+        if (controller.isLoading.value && controller.currentPosition.value == null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(),
+                const CircularProgressIndicator(),
+                SizedBox(height: 16.h),
+                const Text("Loading Location..."),
+                const Spacer(),
+              ],
+            ),
+          );
         }
 
-        final child = controller.currentChild.value;
-        
-        return SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(20.w),
+        if (controller.currentPosition.value == null) {
+          return const Center(child: Text("Unable to get location."));
+        }
+
+        return Stack(
+          children: [
+            GoogleMap(
+              onMapCreated: controller.onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(
+                  controller.currentPosition.value!.latitude,
+                  controller.currentPosition.value!.longitude,
+                ),
+                zoom: 13,
+              ),
+              markers: controller.markers.toSet(),
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+            ),
+            
+            Positioned(
+              bottom: 24.h,
+              left: 24.w,
+              right: 24.w,
+              child: Container(
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      radius: 50.r,
-                      backgroundColor: AppColors.primary.withOpacity(0.1),
-                      backgroundImage: child?.profileImageUrl != null
-                          ? NetworkImage(child!.profileImageUrl!)
-                          : null,
-                      child: child?.profileImageUrl == null
-                          ? Icon(Icons.person, size: 50.r, color: AppColors.primary)
-                          : null,
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, color: AppColors.primary, size: 24.w),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Current Location",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.sp,
+                                ),
+                              ),
+                              Text(
+                                "Tracking Active Medical Facilities",
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 12.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (controller.distanceToCenter.value.isNotEmpty)
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            child: Text(
+                              "${controller.distanceToCenter.value} km",
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     SizedBox(height: 16.h),
-                    
-                    Text(
-                      child?.childName ?? "Child",
-                      style: TextStyle(
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    
-              
-                    Text(
-                      "Age: ${child?.age ?? 0}",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: AppColors.textSecondary,
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: controller.openInGoogleMaps,
+                        icon: const Icon(Icons.map),
+                        label: const Text("Open in Google Maps"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              
-              SizedBox(height: 20.h),
-              
-              _buildQuickAction(
-                icon: Icons.favorite,
-                title: "My Favorites",
-                subtitle: "View saved places",
-                onTap: () {
-                },
-              ),
-              
-              SizedBox(height: 12.h),
-              
-              _buildQuickAction(
-                icon: Icons.shield,
-                title: "My Safe Zones",
-                subtitle: "View your safe places",
-                onTap: () {
-                  controller.changeTabIndex(1);
-                },
-              ),
-              
-              SizedBox(height: 12.h),
-              
-              _buildQuickAction(
-                icon: Icons.settings,
-                title: "Settings",
-                subtitle: "App preferences",
-                onTap: () {
-                },
-              ),
-              
-              SizedBox(height: 20.h),
-              
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    Get.find<dynamic>();
-                    
-                    Get.offAllNamed('/sign-in');
-                  },
-                  icon: const Icon(Icons.logout),
-                  label: const Text("Logout"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       }),
-    );
-  }
-
-  Widget _buildQuickAction({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(icon, color: AppColors.primary, size: 24.w),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: AppColors.textSecondary),
-          ],
-        ),
-      ),
     );
   }
 }

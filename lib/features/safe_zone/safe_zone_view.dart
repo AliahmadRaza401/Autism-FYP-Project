@@ -99,13 +99,13 @@ class SafeZoneView extends GetView<SafeZoneController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CText(
-                            text: "Min: 100m",
+                            text: "Min: 10km",
                             fontSize: 14,
                             color: AppColors.textSecondary,
                           ),
                           Obx(() => CText(
                                 text:
-                                    "Max: ${controller.radius.value.toInt()}m",
+                                    "Max: ${controller.radius.value.toInt()}km",
                                 fontSize: 14,
                                 color: AppColors.textSecondary,
                               )),

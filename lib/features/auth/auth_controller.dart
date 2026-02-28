@@ -56,7 +56,7 @@ Future<void> signIn() async {
   final password = passwordController.text.trim();
 
   final emailError = Validator.validateEmail(email);
-  final passError = Validator.validatePassword(password);
+  final passError = Validator.validateSignInPassword(password);
 
   if (emailError != null) return ErrorHandler.showErrorSnackBar(emailError);
   if (passError != null) return ErrorHandler.showErrorSnackBar(passError);
@@ -70,15 +70,15 @@ Future<void> signIn() async {
     
     final user = _authRepository.currentUser;
     if (user != null) {
-      final userData = await _userRepository.getUser(user.uid);
-      final role = userData!.role;
+      await _roleAuthService.refreshUserData();
+      
+      final role = _roleAuthService.currentRole.value;
       
       dev.log("User role detected: $role", name: "AUTH_CONTROLLER");
       
       ErrorHandler.showSuccessSnackBar("Welcome Back", "Login successful");
-
       
-      if (role == 'child') {
+      if (role == UserRole.child) {
         Get.offAllNamed(Routes.CHILD_DASHBOARD);
       } else {
         Get.offAllNamed(Routes.DASHBOARD);
@@ -143,7 +143,7 @@ Future<void> signUp() async {
 
     await _userRepository.createUser(newUser);
     ErrorHandler.showSuccessSnackBar("Account Created", "Welcome to bluecircle");
-    Get.offNamed(Routes.CHILDREN_MANAGEMENT);
+    Get.offAllNamed(Routes.DASHBOARD);
   } catch (e) {
     ErrorHandler.showErrorSnackBar(e);
   } finally {

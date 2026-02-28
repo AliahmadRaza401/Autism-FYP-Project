@@ -271,7 +271,7 @@ class HomeView extends GetView<HomeController> {
                 ),
                 SizedBox(height: 4.h),
                 CText(
-                  text: "0.5 mi awa", // Placeholder distance
+                  text: "0.5 km awa", // Placeholder distance
                   fontSize: 13,
                   color: AppColors.textSecondary,
                 ),

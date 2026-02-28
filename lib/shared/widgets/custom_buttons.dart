@@ -4,6 +4,7 @@ import '../../core/constants/app_constants.dart';
 import 'c_text.dart';
 
 class PrimaryButton extends StatelessWidget {
+  
   final String text;
   final double? height;
   final double? width;
@@ -14,11 +15,14 @@ class PrimaryButton extends StatelessWidget {
   final Color? tcolor;
   final Function() onTap;
   final bool iconEnable;
+  final bool isLoading;
 
   const PrimaryButton({
+
     super.key,
     required this.text,
     this.height,
+    this.isLoading = false,
     this.width,
     this.color,
     this.tcolor,
@@ -43,30 +47,42 @@ class PrimaryButton extends StatelessWidget {
           border: Border.all(color: bcolor ?? AppColors.kprimaryColor),
           borderRadius: BorderRadius.circular(radius ?? 20.r),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-             if (iconEnable) ...[
-                const SizedBox(width: 5),
-                const Icon(
-                  Icons.arrow_back_outlined,
-                  color: AppColors.primarywhiteColor,
-                  size: 18,
-                ),
-                const SizedBox(width: 5),
-             ],
-            CText(
-              text: text,
-              fontSize: textSize ?? 16,
-              fontWeight: FontWeight.w700,
-              color: tcolor ?? AppColors.primarywhiteColor,
-            ),
-          ],
+      child: isLoading
+    ? const SizedBox(
+        height: 20,
+        width: 20,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation<Color>(
+              AppColors.primarywhiteColor),
         ),
+      )
+    : Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (iconEnable) ...[
+            const SizedBox(width: 5),
+            const Icon(
+              Icons.arrow_back_outlined,
+              color: AppColors.primarywhiteColor,
+              size: 18,
+            ),
+            const SizedBox(width: 5),
+          ],
+          CText(
+            text: text,
+            fontSize: textSize ?? 16,
+            fontWeight: FontWeight.w700,
+            color: tcolor ?? AppColors.primarywhiteColor,
+          ),
+        ],
+      ),
       ),
     );
   }
 }
+
+
 class PrimaryIconButton extends StatelessWidget {
   final String text;
   final Function()? onTap;

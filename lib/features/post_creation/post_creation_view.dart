@@ -1,3 +1,4 @@
+import 'package:bluecircle/shared/widgets/custom_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -90,27 +91,34 @@ class PostCreationView extends GetView<PostCreationController> {
             
             SizedBox(height: 32.h),
          
-            Obx(() => SizedBox(
-              width: double.infinity,
-              height: 50.h,
-              child: ElevatedButton(
-                onPressed: controller.isLoading.value ? null : controller.createPost,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: controller.isLoading.value
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const CText(
-                        text: "Create Post",
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-              ),
-            )),
+Obx(() => PrimaryButton(
+      text: "Create Post",
+      width: double.infinity,
+      isLoading: controller.isLoading.value,
+      onTap: controller.createPost,
+))
+
+            // Obx(() => SizedBox(
+            //   width: double.infinity,
+            //   height: 50.h,
+            //   child: ElevatedButton(
+            //     onPressed: controller.isLoading.value ? null : controller.createPost,
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: AppColors.primary,
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(12.r),
+            //       ),
+            //     ),
+            //     child: controller.isLoading.value
+            //         ? const CircularProgressIndicator(color: Colors.white)
+            //         : const CText(
+            //             text: "Create Post",
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.bold,
+            //             color: Colors.white,
+            //           ),
+            //   ),
+            // )),
           ],
         ),
       ),
