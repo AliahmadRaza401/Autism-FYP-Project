@@ -10,6 +10,7 @@ abstract class Routes {
   static const GET_STARTED = _Paths.GET_STARTED;
   static const SIGN_IN = _Paths.SIGN_IN;
   static const SIGN_UP = _Paths.SIGN_UP;
+  static const OTP_VERIFICATION = _Paths.OTP_VERIFICATION;
   static const SAFE_ZONE = _Paths.SAFE_ZONE;
   static const HOME = _Paths.HOME;
   static const FIND_PLACES = _Paths.FIND_PLACES;
@@ -33,6 +34,7 @@ abstract class _Paths {
   static const GET_STARTED = '/get-started';
   static const SIGN_IN = '/sign-in';
   static const SIGN_UP = '/sign-up';
+  static const OTP_VERIFICATION = '/otp-verification';
   static const SAFE_ZONE = '/safe-zone';
   static const HOME = '/home';
   static const FIND_PLACES = '/find-places';
@@ -48,4 +50,3 @@ abstract class _Paths {
   static const POST_CREATION = '/post-creation';
   static const PLACE_CREATION = '/place-creation';
 }
-

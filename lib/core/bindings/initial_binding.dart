@@ -6,6 +6,7 @@ import '../services/storage_service.dart';
 import '../services/location_service.dart';
 import '../services/network_checker_service.dart';
 import '../services/role_auth_service.dart';
+import '../services/ai_chat_service.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/repositories/safe_zone_repository.dart';
@@ -38,6 +39,7 @@ class InitialBinding extends Bindings {
     Get.put(ReviewsRepository(Get.find<FirestoreService>().firestore), permanent: true);
 
     // =============== Services (Dependent)
+    Get.put(AiChatService(), permanent: true);
     Get.put(RoleAuthService(), permanent: true);
     Get.putAsync(() => NotificationService().init(), permanent: true);
   }

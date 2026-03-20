@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
 import '../../shared/widgets/custom_buttons.dart';
@@ -115,6 +116,78 @@ class SignInView extends GetView<AuthController> {
     onTap: controller.signIn,
   ),
 ),
+              SizedBox(height: 12.h),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: AppColors.grey300)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: CText(text: "OR LOGIN WITH PHONE", fontSize: 12, color: AppColors.grey500),
+                  ),
+                  Expanded(child: Divider(color: AppColors.grey300)),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CText(
+                  text: "Phone Number",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              CustomTextField(
+                hintText: "3012345678",
+                preffixIcon: SizedBox(
+                  width: 120.w,
+                  child: CountryCodePicker(
+                    onChanged: (countryCode) =>
+                        controller.setCountryDialCode(countryCode.dialCode),
+                    initialSelection: 'PK',
+                    favorite: const ['PK', 'IN', 'AE', 'SA', 'GB', 'US', 'CA'],
+                    showCountryOnly: false,
+                    showOnlyCountryWhenClosed: false,
+                    hideMainText: true,
+                    alignLeft: false,
+                    padding: EdgeInsets.symmetric(horizontal: 6.w),
+                    textStyle: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14.sp,
+                      fontFamily: 'Poppins',
+                    ),
+                    searchStyle: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14.sp,
+                      fontFamily: 'Poppins',
+                    ),
+                    dialogTextStyle: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14.sp,
+                      fontFamily: 'Poppins',
+                    ),
+                    boxDecoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                ),
+                controller: controller.phoneController,
+                keyboardType: TextInputType.phone,
+                hasPreffix: true,
+                textcolor: AppColors.textPrimary,
+              ),
+              SizedBox(height: 12.h),
+              Obx(
+                () => PrimaryIconButton(
+                  text: controller.isPhoneSignInLoading.value ? "Sending OTP..." : "Login with OTP",
+                  icon: Icons.sms_outlined,
+                  iconEnable: !controller.isPhoneSignInLoading.value,
+                  width: double.infinity,
+                  isLoading: controller.isPhoneSignInLoading.value,
+                  onTap: controller.startPhoneSignInVerification,
+                ),
+              ),
               SizedBox(height: 16.h),
               Row(
                 children: [
@@ -168,5 +241,3 @@ class SignInView extends GetView<AuthController> {
     );
   }
 }
-
-

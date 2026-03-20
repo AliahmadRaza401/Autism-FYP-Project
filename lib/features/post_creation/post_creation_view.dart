@@ -88,6 +88,36 @@ class PostCreationView extends GetView<PostCreationController> {
             ),
             SizedBox(height: 12.h),
             Obx(() => _buildImagePicker()),
+
+            SizedBox(height: 16.h),
+
+            Obx(
+              () => Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: AppColors.grey100,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: CheckboxListTile(
+                  value: controller.hideName.value,
+                  onChanged: controller.toggleHideName,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppColors.primary,
+                  title: const CText(
+                    text: "Hide my name",
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  subtitle: const CText(
+                    text: "Your post will appear as Anonymous.",
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ),
             
             SizedBox(height: 32.h),
          

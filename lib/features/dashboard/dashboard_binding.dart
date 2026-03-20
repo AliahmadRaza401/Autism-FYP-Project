@@ -4,6 +4,7 @@ import '../home/home_controller.dart';
 import '../find_places/find_places_controller.dart';
 import '../community/community_controller.dart';
 import '../profile/profile_controller.dart';
+import '../ai_chat/ai_chat_controller.dart';
 
 class DashboardBinding extends Bindings {
   @override
@@ -12,6 +13,7 @@ class DashboardBinding extends Bindings {
     Get.lazyPut<HomeController>(() => HomeController());
     Get.lazyPut<FindPlacesController>(() => FindPlacesController());
     Get.lazyPut<CommunityController>(() => CommunityController());
+    Get.lazyPut<AiChatController>(() => AiChatController());
     Get.lazyPut<ProfileController>(() => ProfileController());
   }
 }

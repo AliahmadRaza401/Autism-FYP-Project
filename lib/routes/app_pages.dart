@@ -7,6 +7,7 @@ import '../features/onboarding/onboarding_binding.dart';
 import '../features/onboarding/get_started_view.dart';
 import '../features/auth/sign_in_view.dart';
 import '../features/auth/sign_up_view.dart';
+import '../features/auth/otp_verification_view.dart';
 import '../features/auth/auth_binding.dart';
 import '../features/dashboard/dashboard_view.dart';
 import '../features/dashboard/dashboard_binding.dart';
@@ -64,6 +65,11 @@ class AppPages {
     GetPage(
       name: _Paths.SIGN_UP,
       page: () => const SignUpView(),
+      binding: AuthBinding(),
+    ),
+    GetPage(
+      name: _Paths.OTP_VERIFICATION,
+      page: () => const OtpVerificationView(),
       binding: AuthBinding(),
     ),
     GetPage(
@@ -138,4 +144,3 @@ class AppPages {
     ),
   ];
 }
-

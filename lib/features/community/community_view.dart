@@ -21,9 +21,9 @@ class CommunityView extends GetView<CommunityController> {
 
   Widget _buildWelcomeCard() {
     return Container(
-      padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
@@ -76,10 +76,11 @@ class CommunityView extends GetView<CommunityController> {
             itemCount: controller.categories.length,
             itemBuilder: (context, index) {
               final category = controller.categories[index];
+              final postsCount = controller.getPostCountForCategory(category.id);
               return _categoryTile(
                 title: category.name,
                 subtitle: "Join the discussion",
-                postsCount: "${category.postCount} posts",
+                postsCount: "$postsCount posts",
                 iconEmoji: category.icon,
                 onTap: () {
                   controller.selectCategory(category);
@@ -111,7 +112,7 @@ class CommunityView extends GetView<CommunityController> {
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
             ),
           ],

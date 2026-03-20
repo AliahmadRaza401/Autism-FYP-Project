@@ -8,6 +8,7 @@ class PostModel {
   final String categoryId; // NEW: Category reference
   final String? authorName;
   final String? authorImage;
+  final bool hideName;
   
   final GeoPoint? location;
   final String? imageUrl;
@@ -30,6 +31,7 @@ final String? imagePath;
     required this.categoryId,
     this.authorName,
     this.authorImage,
+    this.hideName = false,
     this.imagePath,
     this.imageUrl,
     this.location,
@@ -52,6 +54,7 @@ final String? imagePath;
       categoryId: map['categoryId'] ?? 'general',
       authorName: map['authorName'],
       authorImage: map['authorImage'],
+      hideName: map['hideName'] ?? false,
       imageUrl: map['imageUrl'],
       imagePath: map['imagePath'],
       location: map['location'] as GeoPoint?,
@@ -74,6 +77,7 @@ final String? imagePath;
       'categoryId': categoryId,
       'authorName': authorName,
       'authorImage': authorImage,
+      'hideName': hideName,
       'imageUrl': imageUrl,
       'imagePath':imagePath,
       'location': location,

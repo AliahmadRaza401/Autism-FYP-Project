@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../shared/widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
+import '../../data/models/post_model.dart';
 import 'community_controller.dart';
 import '../../routes/app_pages.dart';
 
@@ -78,7 +79,12 @@ class FilteredPostsView extends GetView<CommunityController> {
     );
   }
 
-  Widget _buildPostCard(post) {
+  Widget _buildPostCard(PostModel post) {
+    final isAnonymous = post.hideName == true;
+    final displayName = isAnonymous ? 'Anonymous Parent' : (post.authorName ?? "Parent");
+    final authorImage = post.authorImage;
+    final imageUrl = post.imageUrl;
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
@@ -87,7 +93,7 @@ class FilteredPostsView extends GetView<CommunityController> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -101,10 +107,10 @@ class FilteredPostsView extends GetView<CommunityController> {
               CircleAvatar(
                 radius: 20.r,
                 backgroundColor: AppColors.grey200,
-                backgroundImage: (post.authorImage != null && post.authorImage.isNotEmpty)
-                    ? NetworkImage(post.authorImage)
+                backgroundImage: !isAnonymous && (authorImage?.isNotEmpty ?? false)
+                    ? NetworkImage(authorImage!)
                     : null,
-                child: (post.authorImage == null || post.authorImage.isEmpty)
+                child: isAnonymous || !(authorImage?.isNotEmpty ?? false)
                     ? Icon(Icons.person, color: AppColors.grey500)
                     : null,
               ),
@@ -114,7 +120,7 @@ class FilteredPostsView extends GetView<CommunityController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CText(
-                      text: post.authorName ?? "Parent",
+                      text: displayName,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -141,12 +147,12 @@ class FilteredPostsView extends GetView<CommunityController> {
             color: AppColors.textPrimary,
             lineHeight: 1.5,
           ),
-          if (post.imageUrl != null && post.imageUrl.isNotEmpty) ...[
+          if (imageUrl?.isNotEmpty ?? false) ...[
             SizedBox(height: 12.h),
             ClipRRect(
               borderRadius: BorderRadius.circular(12.r),
               child: Image.network(
-                post.imageUrl,
+                imageUrl!,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),

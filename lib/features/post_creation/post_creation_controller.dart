@@ -28,6 +28,7 @@ class PostCreationController extends GetxController {
   final Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
   final Rx<File?> selectedImage = Rx<File?>(null);
   final RxBool isLoading = false.obs;
+  final RxBool hideName = false.obs;
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
 
 
@@ -67,6 +68,10 @@ class PostCreationController extends GetxController {
   
   void removeImage() {
     selectedImage.value = null;
+  }
+
+  void toggleHideName(bool? value) {
+    hideName.value = value ?? false;
   }
 
   
@@ -130,7 +135,8 @@ class PostCreationController extends GetxController {
         description: description,
         categoryId: selectedCategory.value!.id,
         authorName: user!.name,
-        authorImage: user.profileImage,
+        authorImage: hideName.value ? null : user.profileImage,
+        hideName: hideName.value,
         imageUrl: imageUrl,
         imagePath: imagePath,
         createdAt: DateTime.now(),
@@ -150,6 +156,7 @@ class PostCreationController extends GetxController {
       descriptionController.clear();
       selectedCategory.value = null;
       selectedImage.value = null;
+      hideName.value = false;
 
       // Get.back();
       dev.log('Can pop: ${Get.key.currentState?.canPop()}', name: 'NAV_DEBUG');

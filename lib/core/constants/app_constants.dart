@@ -44,3 +44,9 @@ class AppStrings {
   static const String signInTitle = "Sign In To Blue Circle";
   static const String signUpTitle = "Sign Up To Blue Circle";
 }
+
+class AppAiConfig {
+  static const String openAiBaseUrl = 'https://api.openai.com/v1';
+  static const String openAiApiKey = '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';
+  static const String openAiModel = 'gpt-3.5-turbo';
+}

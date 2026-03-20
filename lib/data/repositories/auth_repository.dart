@@ -37,4 +37,40 @@ class AuthRepository {
   Future<void> deleteAccount() async {
     await _authService.deleteAccount();
   }
+
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required void Function(String verificationId, int? resendToken) codeSent,
+    required void Function(FirebaseAuthException error) verificationFailed,
+    void Function(PhoneAuthCredential credential)? verificationCompleted,
+    void Function(String verificationId)? codeAutoRetrievalTimeout,
+    int? forceResendingToken,
+  }) async {
+    await _authService.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      codeSent: codeSent,
+      verificationFailed: verificationFailed,
+      verificationCompleted: verificationCompleted,
+      codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
+      forceResendingToken: forceResendingToken,
+    );
+  }
+
+  PhoneAuthCredential buildPhoneAuthCredential({
+    required String verificationId,
+    required String smsCode,
+  }) {
+    return _authService.buildPhoneAuthCredential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+  }
+
+  Future<UserCredential> signInWithPhoneCredential(AuthCredential credential) async {
+    return _authService.signInWithPhoneCredential(credential);
+  }
+
+  Future<UserCredential> linkPhoneCredential(AuthCredential credential) async {
+    return _authService.linkPhoneCredential(credential);
+  }
 }

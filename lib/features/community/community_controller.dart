@@ -66,6 +66,10 @@ class CommunityController extends GetxController {
     selectedCategory.value = null;
   }
 
+  int getPostCountForCategory(String categoryId) {
+    return allPosts.where((post) => post.categoryId == categoryId).length;
+  }
+
   Future<void> likePost(String postId) async {
     final userId = _authRepository.currentUser?.uid;
     if (userId == null) return;

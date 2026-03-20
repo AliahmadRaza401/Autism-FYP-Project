@@ -72,6 +72,54 @@ class AuthService extends GetxService {
     await _auth.currentUser?.delete();
   }
 
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required void Function(String verificationId, int? resendToken) codeSent,
+    required void Function(FirebaseAuthException error) verificationFailed,
+    void Function(PhoneAuthCredential credential)? verificationCompleted,
+    void Function(String verificationId)? codeAutoRetrievalTimeout,
+    int? forceResendingToken,
+  }) async {
+    dev.log("Phone verification started for: $phoneNumber", name: "AUTH_SERVICE");
+
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      forceResendingToken: forceResendingToken,
+      verificationCompleted: verificationCompleted ?? (_) {},
+      verificationFailed: verificationFailed,
+      codeSent: codeSent,
+      codeAutoRetrievalTimeout: codeAutoRetrievalTimeout ?? (_) {},
+    );
+  }
+
+  PhoneAuthCredential buildPhoneAuthCredential({
+    required String verificationId,
+    required String smsCode,
+  }) {
+    return PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+  }
+
+  Future<UserCredential> signInWithPhoneCredential(AuthCredential credential) async {
+    dev.log("Phone sign-in started", name: "AUTH_SERVICE");
+    return _auth.signInWithCredential(credential);
+  }
+
+  Future<UserCredential> linkPhoneCredential(AuthCredential credential) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'No signed-in user found to link the phone number.',
+      );
+    }
+
+    dev.log("Linking phone credential for user: ${user.uid}", name: "AUTH_SERVICE");
+    return user.linkWithCredential(credential);
+  }
+
   Future<UserCredential?> signInWithGoogle() async {
     try {
       dev.log("Google SignIn Attempt", name: "AUTH_SERVICE");

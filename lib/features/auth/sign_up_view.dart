@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
 import '../../shared/widgets/custom_buttons.dart';
@@ -101,6 +102,57 @@ class SignUpView extends GetView<AuthController> {
                 textcolor: AppColors.textPrimary,
               ),
 
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CText(
+                  text: "Phone Number",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+
+              CustomTextField(
+                hintText: "3012345678",
+                preffixIcon: SizedBox(
+                  width: 120.w,
+                  child: CountryCodePicker(
+                    onChanged: (countryCode) =>
+                        controller.setCountryDialCode(countryCode.dialCode),
+                    initialSelection: 'PK',
+                    favorite: const ['PK', 'IN', 'AE', 'SA', 'GB', 'US', 'CA'],
+                    showCountryOnly: false,
+                    showOnlyCountryWhenClosed: false,
+                    hideMainText: true,
+                    alignLeft: false,
+                    padding: EdgeInsets.symmetric(horizontal: 6.w),
+                    textStyle: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14.sp,
+                      fontFamily: 'Poppins',
+                    ),
+                    searchStyle: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14.sp,
+                      fontFamily: 'Poppins',
+                    ),
+                    dialogTextStyle: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14.sp,
+                      fontFamily: 'Poppins',
+                    ),
+                    boxDecoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                ),
+                controller: controller.phoneController,
+                keyboardType: TextInputType.phone,
+                hasPreffix: true,
+                textcolor: AppColors.textPrimary,
+              ),
+
               
               Align(
                 alignment: Alignment.centerLeft,
@@ -142,9 +194,9 @@ class SignUpView extends GetView<AuthController> {
               SizedBox(height: 40.h),
               Obx(
   () => PrimaryIconButton(
-    text: "Sign Up",
+    text: controller.isLoading.value ? "Sending OTP..." : "Sign Up",
     icon: Icons.arrow_forward,
-    iconEnable: true,
+    iconEnable: !controller.isLoading.value,
     width: double.infinity,
     isLoading: controller.isLoading.value,
     onTap: controller.signUp,

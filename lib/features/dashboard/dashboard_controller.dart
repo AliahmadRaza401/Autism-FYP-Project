@@ -21,7 +21,7 @@ class DashboardController extends GetxController {
     }
   }
 
-  bool get showFab => tabIndex.value != 3;
+  bool get showFab => tabIndex.value < 3;
 
   void changeTabIndex(int index) {
     tabIndex.value = index;

@@ -6,6 +6,8 @@ import '../../core/constants/app_constants.dart';
 import '../../shared/widgets/c_text.dart';
 import '../../routes/app_pages.dart';
 import 'home_controller.dart';
+import '../../data/models/post_model.dart';
+import '../../data/models/place_model.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -242,7 +244,7 @@ class HomeView extends GetView<HomeController> {
     });
   }
 
-  Widget _buildMiniPlaceCard(place) {
+  Widget _buildMiniPlaceCard(PlaceModel place) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -312,7 +314,10 @@ class HomeView extends GetView<HomeController> {
     });
   }
 
-  Widget _buildMiniPostCard(post) {
+  Widget _buildMiniPostCard(PostModel post) {
+    final isAnonymous = post.hideName == true;
+    final displayName = isAnonymous ? 'Anonymous Parent' : (post.authorName ?? 'Parent');
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -337,7 +342,7 @@ class HomeView extends GetView<HomeController> {
                 child: Icon(Icons.person, size: 12.r, color: AppColors.primary),
               ),
               SizedBox(width: 8.w),
-              CText(text: post.authorName, fontSize: 13, fontWeight: FontWeight.bold),
+              CText(text: displayName, fontSize: 13, fontWeight: FontWeight.bold),
               const Spacer(),
               CText(
                 text: post.createdAt.toString().substring(0, 10),

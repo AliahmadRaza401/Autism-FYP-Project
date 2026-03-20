@@ -33,4 +33,23 @@ class Validator {
     if (name.length < 2) return "Name too short";
     return null;
   }
+
+  static String? validatePhoneNumber(String phone) {
+    if (phone.isEmpty) return "Phone number is required";
+
+    final sanitizedPhone = phone.replaceAll(RegExp(r'[\s()-]'), '');
+    if (!RegExp(r'^\+[1-9]\d{9,14}$').hasMatch(sanitizedPhone)) {
+      return "Enter phone number with country code, e.g. +923001234567";
+    }
+
+    return null;
+  }
+
+  static String? validateOtpCode(String code) {
+    if (code.isEmpty) return "OTP code is required";
+    if (!RegExp(r'^\d{6}$').hasMatch(code)) {
+      return "Enter the 6-digit OTP code";
+    }
+    return null;
+  }
 }
