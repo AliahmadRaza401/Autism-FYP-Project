@@ -47,6 +47,6 @@ class AppStrings {
 
 class AppAiConfig {
   static const String openAiBaseUrl = 'https://api.openai.com/v1';
-  static const String openAiApiKey = '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';
+  static const String openAiApiKey = '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';
   static const String openAiModel = 'gpt-3.5-turbo';
 }
